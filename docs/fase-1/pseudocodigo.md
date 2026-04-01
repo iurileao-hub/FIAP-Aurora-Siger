@@ -1,4 +1,4 @@
-# Algoritmo de Verificacao de Decolagem
+# Algoritmo de Verificação de Decolagem
 
 ```
 algoritmo "Verificação de Decolagem Aurora SIGER"

@@ -54,26 +54,26 @@ FIAP-Aurora-Siger/
 
 ---
 
-## Entregaveis da Fase 1
+## Entregáveis da Fase 1
 
-| Entregavel | Descricao | Arquivo |
+| Entregável | Descrição | Arquivo |
 |------------|-----------|---------|
-| **1.1** Organizacao da telemetria | Geracao de 100k amostras sinteticas (97k normais + 3k anomalias) com 7 sensores | `aurora_siger/data/generation.py` |
-| **1.2** Algoritmo de verificacao | Pseudocodigo e fluxograma do pipeline de 3 etapas | `docs/fase-1/pseudocodigo.md`, `docs/fase-1/fluxograma.md` |
-| **1.3** Script em Python | Classe `Validator`, funcoes `ai_anomaly_check()`, `calculate_autonomy()` e `launch_decision()` | `aurora_siger/pipeline/validator.py`, `aurora_siger/pipeline/launch.py` |
-| **1.4** Analise energetica | Calculo de autonomia orbital (18 kWh, perdas 14%, consumo orbital 1.2 kW) | `docs/fase-1/energia.md` |
-| **1.5** Analise assistida por IA | Isolation Forest do zero + comparacao com Scikit-learn | `aurora_siger/models/isolation_forest.py` |
-| **1.6** Reflexao critica | Ensaio sobre etica, automacao e limites da IA na tomada de decisao | `docs/fase-1/etica.md` |
+| **1.1** Organização da telemetria | Geração de 100k amostras sintéticas (97k normais + 3k anomalias) com 7 sensores | `aurora_siger/data/generation.py` |
+| **1.2** Algoritmo de verificação | Pseudocódigo e fluxograma do pipeline de 3 etapas | `docs/fase-1/pseudocodigo.md`, `docs/fase-1/fluxograma.md` |
+| **1.3** Script em Python | Classe `Validator`, funções `ai_anomaly_check()`, `calculate_autonomy()` e `launch_decision()` | `aurora_siger/pipeline/validator.py`, `aurora_siger/pipeline/launch.py` |
+| **1.4** Análise energética | Cálculo de autonomia orbital (18 kWh, perdas 14%, consumo orbital 1.2 kW) | `docs/fase-1/energia.md` |
+| **1.5** Análise assistida por IA | Isolation Forest do zero + comparação com Scikit-learn | `aurora_siger/models/isolation_forest.py` |
+| **1.6** Reflexão crítica | Ensaio sobre ética, automação e limites da IA na tomada de decisão | `docs/fase-1/etica.md` |
 
 ---
 
 ## Faixas seguras de telemetria
 
-| Sensor | Faixa segura | Condicao de aborto |
+| Sensor | Faixa segura | Condição de aborto |
 |--------|-------------|--------------------|
 | `internal_temp` | 18 -- 26 °C | Fora da faixa |
 | `external_temp` | -65 -- 125 °C | Fora da faixa |
-| `structural_integrity` | 1 (integro) | != 1 |
+| `structural_integrity` | 1 (íntegro) | != 1 |
 | `energy` | 60 -- 100 % | < 60 % |
 | `vibration` | 0.1 -- 0.5 g | Fora da faixa |
 | `tank_pressure` | 270 -- 340 atm | Fora da faixa |
@@ -83,20 +83,20 @@ FIAP-Aurora-Siger/
 
 ## Arquitetura
 
-O pipeline de decisao de lancamento opera em tres estagios sequenciais. Se qualquer estagio falhar, o lancamento e abortado imediatamente:
+O pipeline de decisão de lançamento opera em três estágios sequenciais. Se qualquer estágio falhar, o lançamento é abortado imediatamente:
 
-1. **Validacao de telemetria** -- cada leitura dos 7 sensores e comparada com sua faixa segura via regras deterministicas (`Validator`).
-2. **Verificacao por IA** -- um modelo Isolation Forest analisa o conjunto de leituras e calcula um anomaly score. Se o score ultrapassar o limiar, a anomalia e detectada mesmo que cada sensor individualmente esteja dentro da faixa.
-3. **Analise energetica** -- calcula a autonomia restante das baterias considerando capacidade, perdas e consumo orbital. A carga deve ser >= 95% para aprovacao Go/No-Go.
+1. **Validação de telemetria** -- cada leitura dos 7 sensores é comparada com sua faixa segura via regras determinísticas (`Validator`).
+2. **Verificação por IA** -- um modelo Isolation Forest analisa o conjunto de leituras e calcula um anomaly score. Se o score ultrapassar o limiar, a anomalia é detectada mesmo que cada sensor individualmente esteja dentro da faixa.
+3. **Análise energética** -- calcula a autonomia restante das baterias considerando capacidade, perdas e consumo orbital. A carga deve ser >= 95% para aprovação Go/No-Go.
 
 ---
 
 ## Roadmap
 
-O projeto Aurora SIGER sera desenvolvido ao longo de **7 fases** durante o ano letivo de 2026, cada fase adicionando novas capacidades ao sistema. Esta entrega corresponde a **Fase 1**.
+O projeto Aurora SIGER será desenvolvido ao longo de **7 fases** durante o ano letivo de 2026, cada fase adicionando novas capacidades ao sistema. Esta entrega corresponde à **Fase 1**.
 
 ---
 
-## Licenca
+## Licença
 
-Distribuido sob a licenca MIT. Veja [LICENSE](LICENSE) para mais detalhes.
+Distribuído sob a licença MIT. Veja [LICENSE](LICENSE) para mais detalhes.
