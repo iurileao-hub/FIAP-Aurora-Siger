@@ -19,6 +19,9 @@ env/
 .vscode/
 .idea/
 
+# Archive (original notebook preserved for reference)
+archive/
+
 # OS
 .DS_Store
 Thumbs.db

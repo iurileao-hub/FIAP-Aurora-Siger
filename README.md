@@ -1,6 +1,6 @@
 # Aurora SIGER
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Gcarmnonapy7/FIAP-Aurora-Siger/blob/main/fases/fase-1/notebook.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iurileao-hub/FIAP-Aurora-Siger/blob/main/fases/fase-1/notebook.ipynb)
 
 Sistema Inteligente de Gerenciamento de Riscos para telemetria pré-decolagem de espaçonaves. O Aurora SIGER simula um pipeline completo de decisão Go/No-Go, combinando validação de sensores por regras, detecção de anomalias com Isolation Forest (implementado do zero) e análise energética — tudo integrado em um único fluxo de três etapas que determina se é seguro decolar.
 
@@ -10,7 +10,7 @@ Sistema Inteligente de Gerenciamento de Riscos para telemetria pré-decolagem de
 
 ```bash
 # Clone o repositório
-git clone https://github.com/Gcarmnonapy7/FIAP-Aurora-Siger.git
+git clone https://github.com/iurileao-hub/FIAP-Aurora-Siger.git
 cd FIAP-Aurora-Siger
 
 # Instale o pacote (com dependências de desenvolvimento e visualização)
