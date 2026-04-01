@@ -114,8 +114,4 @@ def scatter_3d_anomaly(
         height=700,
         legend_title="Anomaly",
     )
-    # Embed as inline HTML so the plot renders in every notebook
-    # environment (VS Code, Colab, JupyterLab) without requiring
-    # extra extensions or specific Plotly renderers.
-    from IPython.display import display, HTML
-    display(HTML(fig.to_html(full_html=False, include_plotlyjs="cdn")))
+    fig.show()

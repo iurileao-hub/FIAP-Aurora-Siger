@@ -26,6 +26,7 @@ viz = [
     "seaborn>=0.13",
     "matplotlib>=3.7",
     "plotly>=5.15",
+    "anywidget>=0.9.13",
 ]
 dev = [
     "pytest>=8.0",
