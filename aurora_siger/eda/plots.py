@@ -114,4 +114,7 @@ def scatter_3d_anomaly(
         height=700,
         legend_title="Anomaly",
     )
-    fig.show()
+    # "notebook" renderer works in both VS Code and Colab;
+    # plain fig.show() relies on the default renderer which
+    # produces blank output in VS Code's Jupyter extension.
+    fig.show(renderer="notebook")
