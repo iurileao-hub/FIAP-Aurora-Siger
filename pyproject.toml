@@ -10,9 +10,9 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
-    { name = "Gabriel Carmona" },
-    { name = "Iúri Leão" },
-    { name = "Márcio Júnior" },
+    { name = "Gabriel Carmona Bittencourt", email = "gabrielcarmonabittencourtpy@gmail.com" },
+    { name = "Iúri Leão de Almeida", email = "iurileao@gmail.com" },
+    { name = "Márcio Francisco dos Santos Júnior", email = "marciofsantos65@gmail.com" },
 ]
 
 dependencies = [

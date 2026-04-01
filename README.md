@@ -115,9 +115,9 @@ O Aurora SIGER será desenvolvido ao longo de **7 fases** durante o ano letivo d
 
 Projeto desenvolvido por alunos do 1.º ano de Ciência da Computação (online) — FIAP, 2026:
 
-- **Gabriel Carmona**
-- **Iúri Leão**
-- **Márcio Júnior**
+- **Gabriel Carmona Bittencourt** — [GitHub](https://github.com/Gcarmnonapy7) · gabrielcarmonabittencourtpy@gmail.com
+- **Iúri Leão de Almeida** — [GitHub](https://github.com/iurileao-hub) · iurileao@gmail.com
+- **Márcio Francisco dos Santos Júnior** — [GitHub](https://github.com/Marcio-VOT) · marciofsantos65@gmail.com
 
 ---
 
