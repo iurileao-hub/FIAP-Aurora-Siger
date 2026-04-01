@@ -1,8 +1,22 @@
 # Aurora SIGER
 
+**Sistema Inteligente de Gerenciamento de Riscos**
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iurileao-hub/FIAP-Aurora-Siger/blob/main/fases/fase-1/notebook.ipynb)
 
-Sistema Inteligente de Gerenciamento de Riscos para telemetria pré-decolagem de espaçonaves. O Aurora SIGER simula um pipeline completo de decisão Go/No-Go, combinando validação de sensores por regras, detecção de anomalias com Isolation Forest (implementado do zero) e análise energética — tudo integrado em um único fluxo de três etapas que determina se é seguro decolar.
+> Projeto desenvolvido como atividade integradora do primeiro ano do curso de **Ciência da Computação (online)** na **FIAP — 2026**. O repositório acompanhará todas as **7 fases** do projeto ao longo do ano letivo, cada fase adicionando novas capacidades ao sistema.
+
+## O que é o Aurora SIGER?
+
+Imagine que você faz parte da equipe de controle de missão de um foguete. Segundos antes da decolagem, dezenas de sensores transmitem dados em tempo real: temperatura da cabine, pressão dos tanques, vibração dos motores, carga das baterias... **Como saber se é seguro decolar?**
+
+O Aurora SIGER responde a essa pergunta simulando um pipeline completo de decisão **Go/No-Go** em três etapas:
+
+1. **Validação de telemetria** — cada sensor é comparado com sua faixa segura por regras determinísticas.
+2. **Verificação por IA** — um modelo Isolation Forest (implementado do zero) analisa combinações de valores para detectar anomalias sutis que passariam despercebidas sensor a sensor.
+3. **Análise energética** — calcula se a carga das baterias é suficiente para cobrir o lançamento e manter a nave em órbita.
+
+Somente se as três etapas forem aprovadas, o sistema emite: **"PRONTO PARA DECOLAR"**.
 
 ---
 
@@ -81,19 +95,19 @@ FIAP-Aurora-Siger/
 
 ---
 
-## Arquitetura
-
-O pipeline de decisão de lançamento opera em três estágios sequenciais. Se qualquer estágio falhar, o lançamento é abortado imediatamente:
-
-1. **Validação de telemetria** -- cada leitura dos 7 sensores é comparada com sua faixa segura via regras determinísticas (`Validator`).
-2. **Verificação por IA** -- um modelo Isolation Forest analisa o conjunto de leituras e calcula um anomaly score. Se o score ultrapassar o limiar, a anomalia é detectada mesmo que cada sensor individualmente esteja dentro da faixa.
-3. **Análise energética** -- calcula a autonomia restante das baterias considerando capacidade, perdas e consumo orbital. A carga deve ser >= 95% para aprovação Go/No-Go.
-
----
-
 ## Roadmap
 
-O projeto Aurora SIGER será desenvolvido ao longo de **7 fases** durante o ano letivo de 2026, cada fase adicionando novas capacidades ao sistema. Esta entrega corresponde à **Fase 1**.
+O Aurora SIGER será desenvolvido ao longo de **7 fases** durante o ano letivo de 2026. Cada fase adiciona novas capacidades ao sistema, e o pacote `aurora_siger` cresce de forma incremental.
+
+| Fase | Tema | Status |
+|------|------|--------|
+| **1** | Telemetria, Isolation Forest, pipeline Go/No-Go | Concluída |
+| **2** | *Em breve* | — |
+| **3** | *Em breve* | — |
+| **4** | *Em breve* | — |
+| **5** | *Em breve* | — |
+| **6** | *Em breve* | — |
+| **7** | *Em breve* | — |
 
 ---
 
