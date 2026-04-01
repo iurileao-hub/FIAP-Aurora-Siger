@@ -25,6 +25,10 @@ def generate_telemetry_dataset(
 
     # --- Normal data ---
     tank_pressure_normal = rng.normal(loc=305, scale=15, size=n_normal)
+    # Logistic (sigmoid) function to model a realistic pressure-failure
+    # correlation: failure probability rises smoothly as pressure increases.
+    # 340 = inflection point (pressure where failure chance hits 50%)
+    # 5   = steepness (lower = sharper transition from safe to dangerous)
     failure_prob = 1 / (1 + np.exp(-(tank_pressure_normal - 340) / 5))
     failure_prob = np.clip(failure_prob, 0, 1)
 
@@ -40,9 +44,15 @@ def generate_telemetry_dataset(
 
     # --- Anomaly data (shifted distributions) ---
     tank_pressure_anomaly = rng.normal(loc=360, scale=25, size=n_anomalies)
+    # Same sigmoid but inflection at 300 atm (vs 340 for normal data),
+    # so anomalous readings have much higher failure probability at the
+    # same pressure — reflecting degraded structural conditions.
     failure_prob_anomaly = 1 / (1 + np.exp(-(tank_pressure_anomaly - 300) / 5))
     failure_prob_anomaly = np.clip(failure_prob_anomaly, 0, 1)
 
+    # Bimodal anomaly: half overheating (~35 °C), half overcooling (~5 °C).
+    # Both fall outside the safe range [18, 26] but in opposite directions,
+    # simulating two distinct failure modes.
     internal_temp_anomaly = np.concatenate([
         rng.normal(35, 3, size=n_anomalies // 2),
         rng.normal(5, 2, size=n_anomalies - n_anomalies // 2),

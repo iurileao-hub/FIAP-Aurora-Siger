@@ -18,6 +18,7 @@ def ai_anomaly_check(
 
     Returns True if the reading is considered normal (score below threshold).
     """
+    # Build a feature vector in the same column order used during training
     features = np.array([[reading[col] for col in FEATURE_COLUMNS]])
     X_scaled = scaler.transform(features)
     score = model.anomaly_score(X_scaled)[0]
@@ -52,8 +53,11 @@ def calculate_autonomy(
         print("Carga insuficiente para lancamento")
         return None
 
+    # Net usable energy after accounting for transmission/conversion losses
     available_energy = capacity_kwh * (charge_pct / 100) * (1 - loss_pct / 100)
+    # Energy consumed during the launch phase (power × time in hours)
     launch_energy = launch_power_kw * (launch_time_min / 60)
+    # Remaining energy divided by orbital consumption rate → hours of autonomy
     autonomy = (available_energy - launch_energy) / orbital_power_kw
 
     print(f"Energia disponivel: {available_energy:.2f} kWh")

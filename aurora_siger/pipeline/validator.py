@@ -3,6 +3,9 @@
 from typing import Any
 
 
+# Safe operating ranges for pre-launch telemetry validation.
+# "range" rules check min <= value <= max; "binary" rules check value == expected.
+# Units: temp in °C, energy in %, vibration in g, pressure in atm.
 RULES: dict[str, dict[str, Any]] = {
     "internal_temp":        {"type": "range",  "min": 18,   "max": 26},
     "external_temp":        {"type": "range",  "min": -65,  "max": 125},

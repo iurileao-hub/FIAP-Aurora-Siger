@@ -25,6 +25,7 @@ def heatmap_plot(data: pd.DataFrame) -> None:
     plt.figure(figsize=(7.5, 6))
     plt.title("Heatmap of the correlation between variables")
     corr = data.corr()
+    # Mask the upper triangle to avoid redundant mirrored values
     mask = np.triu(np.ones_like(corr, dtype=bool))
     sns.heatmap(corr, mask=mask, annot=True, fmt=".2f")
     plt.show()
@@ -34,6 +35,7 @@ def distribution_plot(data: pd.DataFrame) -> None:
     """Plot histograms with KDE for all columns."""
     n_vars = len(data.columns)
     n_cols = 2
+    # Ceiling division to fit all variables into a 2-column grid
     n_rows = (n_vars + n_cols - 1) // n_cols
 
     plt.figure(figsize=(16, 4 * n_rows))
@@ -90,6 +92,7 @@ def scatter_3d_anomaly(
         print("Dataframe is empty.")
         return
 
+    # Validate all required columns exist before building the plot
     required = [x_axis, y_axis, z_axis, "anomaly"]
     for col in required:
         if col not in data.columns:

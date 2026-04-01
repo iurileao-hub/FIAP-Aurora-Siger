@@ -35,21 +35,26 @@ class IsolationTree:
     def _grow_tree(self, X: np.ndarray, depth: int) -> IsolationTreeNode:
         n_samples, n_features = X.shape
 
+        # Stop splitting: max depth reached or only one point left to isolate
         if depth >= self.max_depth or n_samples <= 1:
             return IsolationTreeNode(size=n_samples)
 
+        # Pick a random feature and find its value range in this subset
         feature = np.random.randint(0, n_features)
         min_val = X[:, feature].min()
         max_val = X[:, feature].max()
 
+        # All values identical on this feature — no useful split possible
         if min_val == max_val:
             return IsolationTreeNode(size=n_samples)
 
+        # Random split point between the observed min and max
         threshold = np.random.uniform(min_val, max_val)
 
         left_mask = X[:, feature] < threshold
         right_mask = ~left_mask
 
+        # Edge case: if all points fall on one side, treat as a leaf
         if np.sum(left_mask) == 0 or np.sum(right_mask) == 0:
             return IsolationTreeNode(size=n_samples)
 
@@ -65,9 +70,11 @@ class IsolationTree:
     def _path_length(
         self, x: np.ndarray, node: IsolationTreeNode, depth: int
     ) -> float:
+        # Leaf reached: actual depth + estimated remaining depth for unsplit points
         if node.size is not None:
             return depth + self._average_path_length(node.size)
 
+        # Traverse left or right based on the split criterion
         if x[node.feature] < node.threshold:
             return self._path_length(x, node.left, depth + 1)
         else:
@@ -101,6 +108,7 @@ class MyIsolationForest:
         """Fit the forest by building isolation trees on random subsamples."""
         self.trees = []
         n_samples = X.shape[0]
+        # Tree height limit: log2(sample_size) — sufficient to isolate most points
         max_depth = int(np.ceil(np.log2(self.sample_size)))
 
         for _ in range(self.n_trees):
@@ -113,10 +121,19 @@ class MyIsolationForest:
     def anomaly_score(self, X: np.ndarray) -> np.ndarray:
         """Compute anomaly scores for each row. Higher = more anomalous."""
         scores = []
+        # c(n) = expected path length in a BST with n nodes — serves as the
+        # baseline for "how long a path would be if nothing were anomalous".
+        # Dividing by c normalizes scores so they are comparable across
+        # different sample sizes.
         c = self._average_path_length(self.sample_size)
 
         for x in X:
+            # Average the path length across all trees in the ensemble
             avg_path = np.mean([tree.path_length(x) for tree in self.trees])
+            # s(x) = 2^(-E(h(x)) / c(n)):
+            #   short path (anomaly isolated quickly) → score near 1
+            #   path ≈ c (average, normal point)      → score near 0.5
+            #   long path (hard to isolate, very normal) → score near 0
             score = 2 ** (-avg_path / c)
             scores.append(score)
 
