@@ -10,7 +10,9 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
-    { name = "Iuri Leao" },
+    { name = "Gabriel Carmona" },
+    { name = "Iúri Leão" },
+    { name = "Márcio Júnior" },
 ]
 
 dependencies = [

@@ -111,6 +111,16 @@ O Aurora SIGER será desenvolvido ao longo de **7 fases** durante o ano letivo d
 
 ---
 
+## Autores
+
+Projeto desenvolvido por alunos do 1.º ano de Ciência da Computação (online) — FIAP, 2026:
+
+- **Gabriel Carmona**
+- **Iúri Leão**
+- **Márcio Júnior**
+
+---
+
 ## Licença
 
 Distribuído sob a licença MIT. Veja [LICENSE](LICENSE) para mais detalhes.
