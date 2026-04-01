@@ -1,15 +1,11 @@
 """Launch decision pipeline — AI check, energy analysis, and final GO/NO-GO."""
 
 import numpy as np
-import pandas as pd
 
-from aurora_siger.pipeline.validator import Validator
+from aurora_siger.pipeline.validator import Validator, RULES
 
 
-FEATURE_COLUMNS = [
-    "internal_temp", "external_temp", "structural_integrity",
-    "energy", "vibration", "tank_pressure", "critical_modules",
-]
+FEATURE_COLUMNS = list(RULES.keys())
 
 
 def ai_anomaly_check(
@@ -90,8 +86,8 @@ def launch_decision(
     validator = Validator()
 
     print("\n=== TELEMETRIA ===")
-    telemetry_ok = validator.validate_item(reading)
     details = validator.validate_item_detail(reading)
+    telemetry_ok = all(v == "OK" for v in details.values())
     for k, v in details.items():
         print(f"{k}: {v}")
 

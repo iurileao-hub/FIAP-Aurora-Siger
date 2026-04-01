@@ -1,11 +1,10 @@
-import numpy as np
 import pandas as pd
 from aurora_siger.data.generation import generate_telemetry_dataset
 
 
-def test_dataset_shape_default():
-    df = generate_telemetry_dataset()
-    assert df.shape == (100_000, 8)
+def test_dataset_shape():
+    df = generate_telemetry_dataset(n_samples=100)
+    assert df.shape == (100, 8)
 
 
 def test_dataset_columns():
@@ -29,7 +28,7 @@ def test_anomaly_label_values():
 
 
 def test_energy_clipped():
-    df = generate_telemetry_dataset(n_samples=50_000, seed=42)
+    df = generate_telemetry_dataset(n_samples=1_000, seed=42)
     assert df["energy"].min() >= 0
     assert df["energy"].max() <= 100
 

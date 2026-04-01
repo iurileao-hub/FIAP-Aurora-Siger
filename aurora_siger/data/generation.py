@@ -31,7 +31,7 @@ def generate_telemetry_dataset(
     df_normal = pd.DataFrame({
         "internal_temp": rng.normal(loc=22, scale=1.5, size=n_normal),
         "external_temp": rng.normal(loc=10, scale=8, size=n_normal),
-        "structural_integrity": rng.binomial(1, 1 - failure_prob),
+        "structural_integrity": rng.binomial(1, 1 - failure_prob, size=n_normal),
         "energy": np.clip(rng.normal(loc=98, scale=2, size=n_normal), 0, 100),
         "vibration": rng.normal(loc=0.3, scale=0.1, size=n_normal),
         "tank_pressure": tank_pressure_normal,
@@ -52,7 +52,7 @@ def generate_telemetry_dataset(
     df_anomaly = pd.DataFrame({
         "internal_temp": internal_temp_anomaly,
         "external_temp": rng.normal(loc=60, scale=20, size=n_anomalies),
-        "structural_integrity": rng.binomial(1, 1 - failure_prob_anomaly),
+        "structural_integrity": rng.binomial(1, 1 - failure_prob_anomaly, size=n_anomalies),
         "energy": np.clip(rng.normal(loc=40, scale=15, size=n_anomalies), 0, 100),
         "vibration": rng.normal(loc=1.2, scale=0.4, size=n_anomalies),
         "tank_pressure": tank_pressure_anomaly,

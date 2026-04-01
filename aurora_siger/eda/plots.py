@@ -18,7 +18,6 @@ def configure_style() -> None:
         "ytick.color": "white",
     })
     sns.set_context("talk")
-    sns.despine()
 
 
 def heatmap_plot(data: pd.DataFrame) -> None:
@@ -69,7 +68,7 @@ def boxplot_analysis(data: pd.DataFrame) -> None:
 
 def pairplot_data(data: pd.DataFrame) -> None:
     """Plot pairwise feature relationships colored by anomaly label."""
-    if data is None or data.empty:
+    if data.empty:
         print("Dataframe is empty")
         return
 
@@ -87,7 +86,7 @@ def scatter_3d_anomaly(
     """Plot a 3D scatter colored by anomaly label using Plotly."""
     import plotly.express as px
 
-    if data is None or data.empty:
+    if data.empty:
         print("Dataframe is empty.")
         return
 
