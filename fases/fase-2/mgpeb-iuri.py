@@ -461,11 +461,13 @@ def load_modules():
     Cria cópias independentes (dict()) para preservar MODULES_DATA.
     """
     global landing_queue, landed_modules, waiting_modules, alert_stack
-    # TODO: reiniciar as 4 estruturas como listas vazias
-    # TODO: percorrer MODULES_DATA e enqueue(landing_queue, dict(module))
-    #   Nota: dict(module) cria uma cópia para não alterar os dados originais
-    pass
+    landing_queue = []          # Fila (FIFO) — módulos aguardando autorização de pouso
+    landed_modules = []         # Lista — módulos já pousados com sucesso
+    waiting_modules = []        # Lista — módulos com pouso adiado
+    alert_stack = []            # Pilha (LIFO) — registros de alertas de bloqueio
 
+    for module in MODULES_DATA:
+        enqueue(landing_queue, dict(module))
 
 def run_landing_simulation():
     """
@@ -479,26 +481,49 @@ def run_landing_simulation():
         5. Módulos bloqueados vão para waiting_modules + alerta na pilha
         6. Exibe resumo completo da operação
     """
-    # TODO: chamar load_modules() e sort_by_priority(landing_queue)
+    # Preparação: recarregar módulos e ordenar por prioridade
+    load_modules()
+    sort_by_priority(landing_queue)
 
-    # TODO: imprimir cabeçalho da simulação com condições atuais
-    #   Dica: landing_conditions["atmosphere_ok"] → "OK" ou "DESFAVORÁVEL"
+    print()
+    print("=" * 60)
+    print("     SIMULAÇÃO DE POUSO — Colônia Aurora Siger")
+    print("=" * 60)
+    print()
+    atm = "OK" if landing_conditions["atmosphere_ok"] else "DESFAVORÁVEL"
+    zone = "LIVRE" if landing_conditions["landing_zone_free"] else "OCUPADA"
+    sens = "OK" if landing_conditions["sensors_ok"] else "FALHA"
+    print(f"  Condições: Atmosfera={atm} | Zona={zone} | Sensores={sens}")
+    print()
+    print(f"  Processando fila de pouso ({len(landing_queue)} módulos)...")
+    print("-" * 60)
 
-    # TODO: loop while not is_empty(landing_queue):
-    #   module = dequeue(landing_queue)
-    #   authorized = check_landing_authorization(module, landing_conditions)
-    #   Se autorizado:
-    #     module["status"] = "landed"
-    #     adicionar a landed_modules
-    #     imprimir "[AUTORIZADO] nome"
-    #   Se bloqueado:
-    #     module["status"] = "waiting"
-    #     adicionar a waiting_modules
-    #     imprimir "[BLOQUEADO] nome" + motivo (peek na alert_stack)
+    # Processar cada módulo sequencialmente
+    while not is_empty(landing_queue):
+        module = dequeue(landing_queue)
+        authorized = check_landing_authorization(module, landing_conditions)
 
-    # TODO: imprimir resumo — total pousados, em espera, alertas
-    pass
+        if authorized:
+            module["status"] = "landed"
+            landed_modules.append(module)
+            print(f"  [AUTORIZADO] {module['name']}")
+        else:
+            module["status"] = "waiting"
+            waiting_modules.append(module)
+            last_alert = peek(alert_stack)
+            reason = last_alert["reason"] if last_alert else "Desconhecido"
+            print(f"  [BLOQUEADO]  {module['name']}")
+            print(f"               Motivo: {reason}")
 
+    # Resumo da simulação
+    print()
+    print("-" * 60)
+    print("     RESUMO DA SIMULAÇÃO")
+    print("-" * 60)
+    print(f"  Módulos pousados com sucesso:  {len(landed_modules)}")
+    print(f"  Módulos em espera (bloqueados): {len(waiting_modules)}")
+    print(f"  Alertas gerados:               {len(alert_stack)}")
+    print()
 
 # =============================================================================
 # [8] EXIBIÇÃO E MENU — Interface com o operador
