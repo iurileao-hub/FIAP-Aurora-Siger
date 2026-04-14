@@ -389,8 +389,7 @@ def descent_altitude(t, h0=2000.0, v0=80.0, a=3.7):
 
     Retorna: altitude em metros
     """
-    # TODO: retornar h0 - v0 * t - 0.5 * a * t ** 2
-    pass
+    return h0 - v0 * t - 0.5 * a * t ** 2
 
 
 def fuel_consumption(v, c0=10.0, k=0.02):
@@ -408,8 +407,7 @@ def fuel_consumption(v, c0=10.0, k=0.02):
 
     Retorna: consumo de combustível em kg/s
     """
-    # TODO: retornar c0 * math.exp(k * v)
-    pass
+    return c0 * math.exp(k * v)
 
 
 def solar_energy(t, a_coeff=15.0, t_mid=12.3, e_max=2200.0):
@@ -428,10 +426,8 @@ def solar_energy(t, a_coeff=15.0, t_mid=12.3, e_max=2200.0):
 
     Retorna: energia gerada em watts (mínimo 0)
     """
-    # TODO: calcular energy = -a_coeff * (t - t_mid) ** 2 + e_max
-    # TODO: se energy < 0, retornar 0.0
-    # TODO: retornar energy
-    pass
+    energy = max(0.0, (-a_coeff * (t - t_mid) ** 2 + e_max))
+    return energy
 
 
 def surface_temperature(t, t_avg=-60.0, amplitude=40.0, period=24.62, phase=0.0):
@@ -451,8 +447,7 @@ def surface_temperature(t, t_avg=-60.0, amplitude=40.0, period=24.62, phase=0.0)
 
     Retorna: temperatura em °C
     """
-    # TODO: retornar t_avg + amplitude * math.sin(2 * math.pi * t / period - phase)
-    pass
+    return t_avg + amplitude * math.sin(2 * math.pi * t / period - phase)
 
 
 # =============================================================================
