@@ -183,7 +183,7 @@ def dequeue(queue):
     Remove e retorna o primeiro módulo da fila (operação FIFO).
     Retorna None se a fila estiver vazia.
     """
-    if len(queue) == 0:
+    if is_empty(queue):
         return None
     return queue.pop(0)
 
@@ -198,7 +198,7 @@ def pop(stack):
     Remove e retorna o item do topo da pilha (operação LIFO).
     Retorna None se a pilha estiver vazia.
     """
-    if len(stack) == 0:
+    if is_empty(stack):
         return None
     return stack.pop()
 
@@ -208,7 +208,7 @@ def peek(stack):
     Consulta o item do topo da pilha sem removê-lo.
     Retorna None se a pilha estiver vazia.
     """
-    if len(stack) == 0:
+    if is_empty(stack):
         return None
     return stack[-1]
 
@@ -263,8 +263,8 @@ def check_landing_authorization(module, conditions):
             reasons.append("Falha nos sensores")
 
         alert = {
-            "id": module["id"],
-            "name": module["name"],
+            "module_id": module["id"],
+            "module_name": module["name"],
             "reason": "; ".join(reasons),
             "timestamp": module["estimated_arrival"],
         }
@@ -284,10 +284,11 @@ def search_by_type(modules, module_type):
 
     Complexidade: O(n) — percorre todos os elementos uma vez.
     """
-    # TODO: criar lista vazia results
-    # TODO: percorrer modules, adicionando a results os que têm type == module_type
-    # TODO: retornar results
-    pass
+    results = []
+    for module in modules:
+        if module["type"] == module_type:
+            results.append(module)
+    return results
 
 
 def search_min_fuel(modules):
@@ -298,11 +299,13 @@ def search_min_fuel(modules):
     Inicializa com o primeiro elemento e compara com cada subsequente.
     Complexidade: O(n).
     """
-    # TODO: verificar se modules está vazia (retornar None)
-    # TODO: inicializar min_module com modules[0]
-    # TODO: percorrer de 1 a len(modules), comparando fuel_level
-    # TODO: retornar min_module
-    pass
+    if is_empty(modules):
+        return None
+    min_module = modules[0]
+    for i in range(1, len(modules)):
+        if modules[i]["fuel_level"] < min_module["fuel_level"]:
+            min_module = modules[i]
+    return min_module
 
 
 def search_highest_priority(modules):
@@ -312,11 +315,13 @@ def search_highest_priority(modules):
 
     Complexidade: O(n).
     """
-    # TODO: verificar se modules está vazia (retornar None)
-    # TODO: inicializar best com modules[0]
-    # TODO: percorrer de 1 a len(modules), comparando priority (menor = melhor)
-    # TODO: retornar best
-    pass
+    if is_empty(modules):
+        return None
+    best = modules[0]
+    for i in range(1, len(modules)):
+        if modules[i]["priority"] < best["priority"]:
+            best = modules[i]
+    return best
 
 
 # =============================================================================
@@ -334,13 +339,14 @@ def sort_by_priority(modules):
     Complexidade: O(n²) no pior caso, O(n) no melhor caso (já ordenada).
     """
     n = len(modules)
-    # TODO: loop externo i de 0 a n
-    #   TODO: inicializar swapped = False
-    #   TODO: loop interno j de 0 a n - i - 1
-    #     TODO: se modules[j]["priority"] > modules[j+1]["priority"], trocar
-    #       Swap: modules[j], modules[j+1] = modules[j+1], modules[j]
-    #       swapped = True
-    #   TODO: se not swapped, break (lista já está ordenada)
+    for i in range(n):
+        swapped = False
+        for j in range(n - i - 1):
+            if modules[j]["priority"] > modules[j + 1]["priority"]:
+                modules[j], modules[j + 1] = modules[j + 1], modules[j]
+                swapped = True
+        if not swapped:
+            break
     return modules
 
 
@@ -354,12 +360,13 @@ def sort_by_fuel(modules):
     Complexidade: O(n²) em todos os casos, mas eficiente em trocas.
     """
     n = len(modules)
-    # TODO: loop externo i de 0 a n
-    #   TODO: inicializar min_idx = i
-    #   TODO: loop interno j de i+1 a n
-    #     TODO: se modules[j]["fuel_level"] < modules[min_idx]["fuel_level"]
-    #       min_idx = j
-    #   TODO: se min_idx != i, trocar modules[i] com modules[min_idx]
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if modules[j]["fuel_level"] < modules[min_idx]["fuel_level"]:
+                min_idx = j
+        if min_idx != i:
+            modules[i], modules[min_idx] = modules[min_idx], modules[i]
     return modules
 
 
