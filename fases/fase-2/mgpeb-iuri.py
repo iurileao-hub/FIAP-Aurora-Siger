@@ -12,6 +12,7 @@ algoritmos clássicos de busca e ordenação, e funções matemáticas aplicadas
 """
 
 import math
+import random
 
 
 # =============================================================================
@@ -167,6 +168,60 @@ landing_conditions = {
     "landing_zone_free": True,      # Zona de pouso disponível
     "sensors_ok": True,             # Integridade dos sensores
 }
+
+
+# Probabilidades de cada condição ambiental estar OK no início da missão.
+# Valores inspirados em realismo de missão espacial:
+#   - Sensores são redundantes e raramente falham (95%)
+#   - Zona de pouso costuma estar livre com bom planejamento orbital (90%)
+#   - Atmosfera marciana é o fator mais volátil — tempestades de poeira (70%)
+CONDITION_PROBABILITIES = {
+    "atmosphere_ok": 0.70,
+    "landing_zone_free": 0.90,
+    "sensors_ok": 0.95,
+}
+
+# Faixa de combustível sorteada por módulo (%).
+# Limite inferior 15 permite gerar ocasionalmente módulos bloqueados
+# pelo limiar de 20% definido em check_landing_authorization.
+FUEL_RANGE_MIN = 15.0
+FUEL_RANGE_MAX = 95.0
+
+
+def randomize_scenario():
+    """
+    Sorteia um novo cenário de pouso: randomiza o fuel_level de cada módulo
+    em MODULES_DATA e alterna as flags de landing_conditions.
+
+    Deve ser chamada uma vez no início de main(), antes de load_modules(),
+    para que cada execução do simulador apresente condições diferentes.
+
+    Design:
+        - fuel_level: distribuição uniforme entre FUEL_RANGE_MIN e FUEL_RANGE_MAX
+        - condições: cada flag sorteada com sua própria probabilidade
+          (ver CONDITION_PROBABILITIES)
+
+    Efeitos colaterais:
+        - Modifica MODULES_DATA in-place (o novo fuel_level se propaga
+          para landing_queue via load_modules)
+        - Modifica landing_conditions in-place
+    """
+    global landing_conditions
+
+    for module in MODULES_DATA:
+        module["fuel_level"] = round(random.uniform(FUEL_RANGE_MIN, FUEL_RANGE_MAX), 1)
+
+    for condition in landing_conditions:
+        landing_conditions[condition] = random.random() < CONDITION_PROBABILITIES[condition]
+
+    # Impressão do cenário sorteado para o operador ter uma visão clara das condições atuais antes de iniciar a simulação.
+    print()
+    print("  >> CENÁRIO ALEATÓRIO GERADO <<")
+    atm = "OK" if landing_conditions["atmosphere_ok"] else "DESFAVORÁVEL"
+    zone = "LIVRE" if landing_conditions["landing_zone_free"] else "OCUPADA"
+    sens = "OK" if landing_conditions["sensors_ok"] else "FALHA"
+    print(f"     Atmosfera={atm} | Zona={zone} | Sensores={sens}")
+    print(f"     Combustível dos módulos: randomizado entre {FUEL_RANGE_MIN}% e {FUEL_RANGE_MAX}%")
 
 
 # =============================================================================
@@ -713,6 +768,10 @@ def main():
     Loop principal do MGPEB.
     Apresenta menu interativo e despacha para as funções correspondentes.
     """
+    # Randomizar cenário (combustíveis e condições) antes de carregar a fila,
+    # para que cada execução apresente um desafio diferente ao operador.
+    randomize_scenario()
+
     # Carregar módulos na fila ao iniciar o sistema
     load_modules()
 
