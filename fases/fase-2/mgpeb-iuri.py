@@ -531,27 +531,34 @@ def run_landing_simulation():
 
 def display_module(module):
     """Exibe os dados de um módulo em formato de linha única formatada."""
-    # TODO: imprimir linha formatada com id, name, priority, fuel_level, mass,
-    #   cargo_criticality e status
-    #   Dica: f"  [ID:{module['id']:02d}] {module['name']:<28s} | ..."
-    pass
-
+    print(f"\n[ID:{module['id']}] {module['name']}\n | Prioridade: {module['priority']}\n | Combustível: {module['fuel_level']}\n | Massa: {module['mass']}\n | Crítico: {module['cargo_criticality']}")
 
 def display_modules(modules, title):
     """Exibe uma lista de módulos com título e contagem."""
-    # TODO: imprimir título com contagem
-    # TODO: se vazia, imprimir "(vazia)"
-    # TODO: senão, percorrer e chamar display_module() para cada um
-    pass
+    print()
+    print(f"--- {title} ({len(modules)} módulos) ---")
+    if is_empty(modules):
+        print("  (vazia)")
+    else:
+        for module in modules:
+            display_module(module)
+    print()
 
 
 def display_alerts():
     """Exibe a pilha de alertas do topo para a base (sem remover)."""
-    # TODO: imprimir título com contagem de alertas
-    # TODO: se vazia, imprimir "(nenhum alerta registrado)"
-    # TODO: senão, percorrer de trás para frente (topo → base)
-    #   e imprimir module_name, reason, timestamp de cada alerta
-    pass
+    print()
+    print(f"--- Pilha de Alertas ({len(alert_stack)} alertas) ---")
+    if is_empty(alert_stack):
+        print("  (nenhum alerta registrado)")
+    else:
+        for i in range(len(alert_stack) - 1, -1, -1):
+            alert = alert_stack[i]
+            position = len(alert_stack) - i
+            print(f"  [{position}] Módulo: {alert['module_name']} (ID:{alert['module_id']:02d})")
+            print(f"      Motivo: {alert['reason']}")
+            print(f"      Horário: {alert['timestamp']}")
+    print()
 
 
 def menu_sort():
@@ -563,31 +570,55 @@ def menu_sort():
     print("  0. Voltar")
     choice = input("Opção: ").strip()
 
-    # TODO: se choice == "1", chamar sort_by_priority e exibir fila
-    # TODO: se choice == "2", chamar sort_by_fuel e exibir fila
-    pass
+    if choice == "1":
+        sort_by_priority(landing_queue)
+        print("\n  Fila ordenada por prioridade.")
+        display_modules(landing_queue, "Fila de Pouso")
+    elif choice == "2":
+        sort_by_fuel(landing_queue)
+        print("\n  Fila ordenada por nível de combustível.")
+        display_modules(landing_queue, "Fila de Pouso")
 
 
 def menu_search():
     """Submenu de busca de módulos na fila ou nos dados originais."""
     # Se a fila estiver vazia (pós-simulação), buscar nos dados originais
     source = landing_queue if not is_empty(landing_queue) else MODULES_DATA
+    source_name = "fila de pouso" if not is_empty(landing_queue) else "dados originais"
 
     print()
-    print("--- Buscar Módulo ---")
+    print(f"--- Buscar Módulo (buscando em: {source_name}) ---")
     print("  1. Por tipo")
     print("  2. Menor combustível")
     print("  3. Maior prioridade")
     print("  0. Voltar")
     choice = input("Opção: ").strip()
 
-    # TODO: se choice == "1":
-    #   pedir tipo via input(), chamar search_by_type(), exibir resultados
-    # TODO: se choice == "2":
-    #   chamar search_min_fuel(), exibir resultado
-    # TODO: se choice == "3":
-    #   chamar search_highest_priority(), exibir resultado
-    pass
+    if choice == "1":
+        print()
+        print("  Tipos disponíveis:")
+        print("    command, life_support, habitat, solar, nuclear, comms,")
+        print("    medical, food, logistics, isru, workshop, lab")
+        module_type = input("  Digite o tipo: ").strip().lower()
+        results = search_by_type(source, module_type)
+        if is_empty(results):
+            print(f"\n  Nenhum módulo do tipo '{module_type}' encontrado.")
+        else:
+            display_modules(results, f"Módulos do tipo '{module_type}'")
+
+    elif choice == "2":
+        result = search_min_fuel(source)
+        if result:
+            print("\n  Módulo com menor combustível:")
+            display_module(result)
+            print()
+
+    elif choice == "3":
+        result = search_highest_priority(source)
+        if result:
+            print("\n  Módulo com maior prioridade:")
+            display_module(result)
+            print()
 
 
 def menu_math():
@@ -601,15 +632,54 @@ def menu_math():
     print("  0. Voltar")
     choice = input("Opção: ").strip()
 
-    # TODO: para cada opção, imprimir a fórmula e parâmetros, depois
-    #   usar um loop for/range para calcular e imprimir valores tabelados.
-    #   Exemplo para altitude:
-    #     for t in range(0, 20):
-    #         h = descent_altitude(t)
-    #         if h < 0:
-    #             print("IMPACTO"); break
-    #         print(f"  t={t}s | h={h:.1f}m")
-    pass
+    if choice == "1":
+        print()
+        print("  Altitude de descida: h(t) = h0 - v0*t - 0.5*a*t^2")
+        print("  Parâmetros: h0=2000m, v0=80m/s, a=3.7m/s^2")
+        print()
+        for t in range(0, 20):
+            h = descent_altitude(t)
+            if h < 0:
+                print(f"    t={t:>2d}s  |  IMPACTO (h < 0)")
+                break
+            bar = "#" * max(0, int(h / 50))
+            print(f"    t={t:>2d}s  |  h={h:>7.1f}m  | {bar}")
+        print()
+
+    elif choice == "2":
+        print()
+        print("  Consumo de combustível: C(v) = C0 * e^(k*v)")
+        print("  Parâmetros: C0=10.0 kg/s, k=0.02")
+        print()
+        for v in range(0, 201, 20):
+            c = fuel_consumption(v)
+            bar = "#" * min(50, int(c / 5))
+            print(f"    v={v:>3d} m/s  |  C={c:>8.2f} kg/s  | {bar}")
+        print()
+
+    elif choice == "3":
+        print()
+        print("  Energia solar: E(t) = -a*(t - t_mid)^2 + E_max")
+        print("  Parâmetros: a=15.0, t_mid=12.3h, E_max=2200W")
+        print()
+        for t in range(0, 25):
+            e = solar_energy(t)
+            bar = "#" * int(e / 100)
+            print(f"    t={t:>2d}h  |  E={e:>7.1f}W  | {bar}")
+        print()
+
+    elif choice == "4":
+        print()
+        print("  Temperatura superficial: T(t) = T_avg + A*sin(2*pi*t/P - phi)")
+        print("  Parâmetros: T_avg=-60°C, A=40°C, P=24.62h")
+        print()
+        for t in range(0, 25):
+            temp = surface_temperature(t)
+            # Escala visual: mapear -100°C...-20°C para 0...20 caracteres
+            bar_len = max(0, int((temp + 100) / 4))
+            bar = " " * bar_len + "#"
+            print(f"    t={t:>2d}h  |  T={temp:>6.1f}°C  | {bar}")
+        print()
 
 
 def menu_conditions():
@@ -628,11 +698,13 @@ def menu_conditions():
         print("  0. Voltar")
         choice = input("Alternar condição (0 para voltar): ").strip()
 
-        # TODO: se choice == "1", inverter landing_conditions["atmosphere_ok"]
-        # TODO: se choice == "2", inverter landing_conditions["landing_zone_free"]
-        # TODO: se choice == "3", inverter landing_conditions["sensors_ok"]
-        # TODO: se choice == "0", break
-        if choice == "0":
+        if choice == "1":
+            landing_conditions["atmosphere_ok"] = not landing_conditions["atmosphere_ok"]
+        elif choice == "2":
+            landing_conditions["landing_zone_free"] = not landing_conditions["landing_zone_free"]
+        elif choice == "3":
+            landing_conditions["sensors_ok"] = not landing_conditions["sensors_ok"]
+        elif choice == "0":
             break
 
 
@@ -664,24 +736,42 @@ def main():
         print("-" * 45)
         choice = input("Opção: ").strip()
 
-        # TODO: conectar cada opção à função correspondente
-        #   "1" → display_modules(landing_queue, "Fila de Pouso")
-        #          + exibir landed_modules e waiting_modules se não vazias
-        #   "2" → menu_sort() (verificar se fila não está vazia antes)
-        #   "3" → menu_search()
-        #   "4" → run_landing_simulation()
-        #   "5" → display_alerts()
-        #   "6" → menu_math()
-        #   "7" → menu_conditions()
-        #   "0" → imprimir despedida e break
+        if choice == "1":
+            display_modules(landing_queue, "Fila de Pouso")
+            if not is_empty(landed_modules):
+                display_modules(landed_modules, "Módulos Pousados")
+            if not is_empty(waiting_modules):
+                display_modules(waiting_modules, "Módulos em Espera")
 
-        if choice == "0":
+        elif choice == "2":
+            if is_empty(landing_queue):
+                print("\n  Fila vazia. Execute a simulação (opção 4) para recarregar.")
+            else:
+                menu_sort()
+
+        elif choice == "3":
+            menu_search()
+
+        elif choice == "4":
+            run_landing_simulation()
+
+        elif choice == "5":
+            display_alerts()
+
+        elif choice == "6":
+            menu_math()
+
+        elif choice == "7":
+            menu_conditions()
+
+        elif choice == "0":
             print()
             print("  Encerrando MGPEB. Missão Aurora Siger — fim da sessão.")
             print()
             break
+
         else:
-            print("  Opção ainda não implementada.")
+            print("  Opção inválida. Tente novamente.")
 
 
 # =============================================================================
