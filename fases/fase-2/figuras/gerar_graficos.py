@@ -1,11 +1,13 @@
 """
 Gera os quatro gráficos das funções matemáticas do MGPEB para o relatório.
 
-Reproduz fielmente as funções de mgpeb.py com seus parâmetros padrão.
-Salva PNGs em figuras/ na resolução adequada para impressão.
+As fórmulas são importadas de ``aurora_siger.landing.physics`` — única fonte
+de verdade compartilhada com o CLI (`mgpeb.py`) e o notebook
+(`fases/fase-2/notebook.ipynb`). Salva PNGs em figuras/ na resolução
+adequada para impressão.
 
-Execução:
-    python3 figuras/gerar_graficos.py
+Execução (a partir da raiz do repositório):
+    python3 fases/fase-2/figuras/gerar_graficos.py
 """
 
 import math
@@ -14,10 +16,15 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Diretório de saída — mesmo do script
+from aurora_siger.landing.physics import (
+    descent_altitude,
+    fuel_consumption,
+    solar_energy,
+    surface_temperature,
+)
+
 OUT_DIR = Path(__file__).parent
 
-# Estilo consistente para todos os gráficos
 plt.rcParams.update({
     "font.family": "Helvetica",
     "font.size": 11,
@@ -34,21 +41,26 @@ plt.rcParams.update({
 })
 
 
+def _evaluate(fn, xs):
+    """Apply a scalar physics function over an array via list comprehension.
+
+    The functions in ``aurora_siger.landing.physics`` are scalar (using
+    ``math``) so the package stays dependency-free. We pay a negligible cost
+    to vectorize here — these plots use ≤ 300 points each.
+    """
+    return np.array([fn(x) for x in xs])
+
+
 # =============================================================================
 # 1. Altitude de descida — quadrática
 # =============================================================================
 
-def descent_altitude(t, h0=2000.0, v0=80.0, a=3.7):
-    return np.maximum(0.0, h0 - v0 * t - 0.5 * a * t ** 2)
-
-
-def plot_descent():
-    # Determina o instante de impacto (raiz positiva da quadrática)
+def plot_descent() -> None:
     h0, v0, a = 2000.0, 80.0, 3.7
     t_impact = (-v0 + math.sqrt(v0 ** 2 + 2 * a * h0)) / a
 
     t = np.linspace(0, t_impact * 1.05, 200)
-    h = descent_altitude(t)
+    h = _evaluate(descent_altitude, t)
 
     fig, ax = plt.subplots(figsize=(5.5, 3.0))
     ax.plot(t, h, color="#1565C0", linewidth=2.2)
@@ -73,19 +85,14 @@ def plot_descent():
 # 2. Consumo de combustível — exponencial
 # =============================================================================
 
-def fuel_consumption(v, c0=10.0, k=0.02):
-    return c0 * np.exp(k * v)
-
-
-def plot_fuel():
+def plot_fuel() -> None:
     v = np.linspace(0, 200, 200)
-    c = fuel_consumption(v)
+    c = _evaluate(fuel_consumption, v)
 
     fig, ax = plt.subplots(figsize=(5.5, 3.0))
     ax.plot(v, c, color="#E65100", linewidth=2.2)
     ax.fill_between(v, 0, c, color="#E65100", alpha=0.12)
 
-    # Anotação de pontos-chave
     for v_ref in (50, 100, 150, 200):
         c_ref = fuel_consumption(v_ref)
         ax.plot(v_ref, c_ref, "o", color="#E65100", markersize=5)
@@ -105,19 +112,14 @@ def plot_fuel():
 # 3. Energia solar — parábola invertida
 # =============================================================================
 
-def solar_energy(t, a_coeff=15.0, t_mid=12.3, e_max=2200.0):
-    return np.maximum(0.0, -a_coeff * (t - t_mid) ** 2 + e_max)
-
-
-def plot_solar():
+def plot_solar() -> None:
     t = np.linspace(0, 24.62, 300)
-    e = solar_energy(t)
+    e = _evaluate(solar_energy, t)
 
     fig, ax = plt.subplots(figsize=(5.5, 3.0))
     ax.plot(t, e, color="#F9A825", linewidth=2.2)
     ax.fill_between(t, 0, e, color="#F9A825", alpha=0.18)
 
-    # Marca pico
     t_mid, e_max = 12.3, 2200.0
     ax.plot(t_mid, e_max, "o", color="#F9A825", markersize=7)
     ax.annotate(
@@ -140,21 +142,16 @@ def plot_solar():
 # 4. Temperatura superficial — senoidal
 # =============================================================================
 
-def surface_temperature(t, t_avg=-60.0, amplitude=40.0, period=24.62, phase=0.0):
-    return t_avg + amplitude * np.sin(2 * np.pi * t / period - phase)
-
-
-def plot_temperature():
-    t = np.linspace(0, 24.62, 300)
-    T = surface_temperature(t)
+def plot_temperature() -> None:
+    period = 24.62
+    t = np.linspace(0, period, 300)
+    T = _evaluate(surface_temperature, t)
 
     fig, ax = plt.subplots(figsize=(5.5, 3.0))
     ax.plot(t, T, color="#1976D2", linewidth=2.2)
     ax.axhline(-60, color="#5D4037", linestyle="--", linewidth=1, alpha=0.6)
     ax.text(0.3, -58.5, "média = −60 °C", fontsize=9, color="#5D4037")
 
-    # Marca máximo e mínimo
-    period = 24.62
     t_max = period / 4               # sin = +1
     t_min = 3 * period / 4           # sin = −1
     ax.plot(t_max, -20, "o", color="#1976D2", markersize=6)
