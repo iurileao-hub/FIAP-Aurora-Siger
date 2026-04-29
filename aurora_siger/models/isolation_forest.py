@@ -87,7 +87,7 @@ class IsolationTree:
         Uses the Euler-Mascheroni constant to approximate the harmonic number.
         """
         if n <= 1:
-            return 0
+            return 0.0
         return 2 * (np.log(n - 1) + 0.5772156649) - (2 * (n - 1) / n)
 
 
@@ -152,5 +152,5 @@ class MyIsolationForest:
         Intentionally duplicated from IsolationTree to keep each class self-contained.
         """
         if n <= 1:
-            return 0
+            return 0.0
         return 2 * (np.log(n - 1) + 0.5772156649) - (2 * (n - 1) / n)
