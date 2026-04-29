@@ -1,0 +1,61 @@
+// Diagrama de hierarquia das estruturas lineares do MGPEB.
+// Vector é a classe base; Queue e Stack herdam de Vector e
+// restringem a interface para preservar invariantes FIFO/LIFO.
+//
+// Renderização: dot -Tpng hierarquia_estruturas.dot -o hierarquia_estruturas.png
+
+digraph hierarquia_estruturas {
+    rankdir=BT;
+    bgcolor="white";
+    fontname="Helvetica";
+    nodesep=0.4;
+    ranksep=0.5;
+    size="4.5,2.5";
+
+    node [fontname="Helvetica", fontsize=10];
+    edge [fontname="Helvetica", fontsize=9];
+
+    // === Classe base ===
+    Vector [
+        shape=box,
+        style="filled,rounded",
+        fillcolor="#E3F2FD",
+        color="#1565C0",
+        penwidth=1.8,
+        label=<<B>Vector</B><BR/><FONT POINT-SIZE="9"><I>acesso aleatório, busca, ordenação</I></FONT>>,
+        height=0.6,
+        width=2.2
+    ];
+
+    // === Subclasses ===
+    Queue [
+        shape=box,
+        style="filled,rounded",
+        fillcolor="#FFF59D",
+        color="#F57F17",
+        penwidth=1.6,
+        label=<<B>Queue</B><BR/><FONT POINT-SIZE="9">(FIFO)</FONT>>,
+        height=0.6,
+        width=1.4
+    ];
+
+    Stack [
+        shape=box,
+        style="filled,rounded",
+        fillcolor="#FFCC80",
+        color="#E65100",
+        penwidth=1.6,
+        label=<<B>Stack</B><BR/><FONT POINT-SIZE="9">(LIFO)</FONT>>,
+        height=0.6,
+        width=1.4
+    ];
+
+    // === Relação de herança (UML simplificada) ===
+    // Setas com triângulo vazio (empty) apontando da subclasse para a base
+    Queue -> Vector [arrowhead=empty, penwidth=1.4];
+    Stack -> Vector [arrowhead=empty, penwidth=1.4];
+
+    // Força Queue à esquerda e Stack à direita
+    {rank=same; Queue; Stack;}
+    Queue -> Stack [style=invis];
+}

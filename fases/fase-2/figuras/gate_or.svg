@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 70" preserveAspectRatio="xMidYMid meet">
+  <!-- Porta OR padrao ANSI/IEEE 91-1984:
+       topo/fundo convexos encontrando-se em ponta a direita,
+       costas concavas (curva entrando) a esquerda. -->
+  <path d="M 4 4
+           C 28 4, 50 4, 84 35
+           C 50 66, 28 66, 4 66
+           Q 22 35, 4 4 Z"
+        fill="#FFF59D" stroke="#F57F17" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="36" y="40" text-anchor="middle"
+        font-family="Helvetica, Arial, sans-serif" font-size="13"
+        font-weight="bold" fill="#000">OR</text>
+</svg>

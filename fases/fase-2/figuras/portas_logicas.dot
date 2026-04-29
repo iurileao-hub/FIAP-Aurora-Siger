@@ -1,0 +1,81 @@
+// Diagrama de portas lógicas — autorização de pouso do MGPEB.
+// Expressão booleana: AUTORIZADO = F AND A AND (L OR E) AND S
+//
+// Layout LR wide (horizontal compacto): inputs à esquerda, portas no centro,
+// saída à direita. Proporção forçada para minimizar altura.
+//
+// Renderização: dot -Tpng portas_logicas.dot -o portas_logicas.png
+
+digraph autorizacao_pouso {
+    rankdir=LR;
+    splines=spline;
+    nodesep=0.12;
+    ranksep=0.75;
+    bgcolor="white";
+    fontname="Helvetica";
+    size="8.2,2.7!";   // proporção forçada wide
+
+    node [fontname="Helvetica", fontsize=9];
+    edge [fontname="Helvetica", fontsize=8];
+
+    // === Entradas em coluna compacta à esquerda ===
+    {
+        rank=same;
+        node [shape=box, style="filled,rounded", fillcolor="#E3F2FD",
+              color="#1565C0", penwidth=1.2, height=0.28, width=1.4, margin="0.04,0.02"];
+        F [label="F  combust. ≥ 20%"];
+        A [label="A  atmosfera OK"];
+        L [label="L  zona livre"];
+        E [label="E  emergência"];
+        S [label="S  sensores OK"];
+    }
+
+    // Força ordem vertical F → A → L → E → S
+    F -> A -> L -> E -> S [style=invis];
+
+    // === Porta OR (recebe L e E) ===
+    // Simbolo classico ANSI/IEEE 91-1984 via SVG externo.
+    OR_LE [
+        shape=none,
+        image="gate_or.svg",
+        imagescale=true,
+        fixedsize=true,
+        width=1.25,
+        height=1.0,
+        label=""
+    ];
+
+    // === Porta AND (recebe F, A, OR, S) ===
+    // Simbolo classico ANSI/IEEE 91-1984 via SVG externo.
+    AND_FINAL [
+        shape=none,
+        image="gate_and.svg",
+        imagescale=true,
+        fixedsize=true,
+        width=1.3,
+        height=1.7,
+        label=""
+    ];
+
+    // === Saída ===
+    AUTH [
+        shape=doubleoctagon,
+        style=filled,
+        fillcolor="#A5D6A7",
+        color="#2E7D32",
+        penwidth=1.6,
+        label="AUTORIZADO\nDE POUSO",
+        fontsize=10
+    ];
+
+    // === Conexões ===
+    L -> OR_LE;
+    E -> OR_LE;
+
+    F -> AND_FINAL;
+    A -> AND_FINAL;
+    OR_LE -> AND_FINAL [label="L∨E", fontsize=8, fontcolor="#5D4037"];
+    S -> AND_FINAL;
+
+    AND_FINAL -> AUTH [penwidth=2];
+}

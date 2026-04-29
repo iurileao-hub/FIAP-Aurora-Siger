@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 70" preserveAspectRatio="xMidYMid meet">
+  <!-- Porta AND padrao ANSI/IEEE 91-1984: retangulo a esquerda + semicirculo a direita -->
+  <path d="M 4 4 L 50 4 A 31 31 0 0 1 50 66 L 4 66 Z"
+        fill="#FFCC80" stroke="#E65100" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="34" y="40" text-anchor="middle"
+        font-family="Helvetica, Arial, sans-serif" font-size="14"
+        font-weight="bold" fill="#000">AND</text>
+</svg>
