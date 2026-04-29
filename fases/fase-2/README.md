@@ -22,7 +22,8 @@ Há duas maneiras de explorar o sistema:
 jupyter notebook fases/fase-2/notebook.ipynb
 
 # 2. Protótipo CLI — menu interativo com todas as operações
-python3 fases/fase-2/mgpeb.py
+mgpeb                          # após `pip install -e .` na raiz do repo
+python3 fases/fase-2/mgpeb.py  # alternativa sem instalar o pacote
 ```
 
 O CLI não tem dependências externas (usa só `math` e `random` da stdlib). O notebook usa `matplotlib`, instalado via `pip install -e ".[viz]"` na raiz do repositório.

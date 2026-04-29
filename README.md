@@ -36,7 +36,10 @@ jupyter notebook fases/fase-1/notebook.ipynb
 # Notebook da fase 2 — pouso e estabilização
 jupyter notebook fases/fase-2/notebook.ipynb
 
-# Ou rode o protótipo CLI da fase 2 diretamente
+# Protótipo CLI da fase 2 (após install, em qualquer diretório)
+mgpeb
+
+# ...ou direto pelo arquivo, sem instalar
 python3 fases/fase-2/mgpeb.py
 ```
 
