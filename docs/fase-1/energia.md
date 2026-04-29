@@ -1,4 +1,4 @@
-### Considerações sobre o gerenciamento energético em foguetes espaciais
+# Considerações sobre o gerenciamento energético em foguetes espaciais
 
 O gerenciamento energético de uma missão espacial é um exercício de engenharia de precisão onde cada quilowatt-hora conta. A capacidade total simulada neste projeto — 18 kWh, cobrindo cápsula e estágio superior — é comparável à de um carro elétrico urbano de entrada de gama. A diferença fundamental, porém, está no contexto: enquanto um veículo terrestre pode ser recarregado em qualquer ponto da rede elétrica, uma cápsula em órbita depende exclusivamente da energia embarcada até que os painéis solares sejam desdobrados e estabilizados. Essa limitação torna imperativo que sistemas como o Aurora SIGER monitorizem a carga em tempo real e imponham limiares rígidos de Go/No-Go — no nosso modelo, 95 % de carga pré-lançamento, alinhado com os ≥ 97 % exigidos em missões tripuladas reais.
 
@@ -6,4 +6,11 @@ Alcançar níveis elevados de eficiência energética no espaço esbarra em rest
 
 Essas restrições tornam-se ainda mais relevantes à luz dos planos da NASA de estabelecer presença humana contínua na Lua a partir de 2027, no âmbito do programa Artemis. Missões de longa duração demandarão avanços significativos em armazenamento energético, sistemas de recarga in situ e eficiência de conversão. A sustentabilidade da exploração espacial dependerá, em última análise, da capacidade de minimizar perdas e maximizar a autonomia com recursos finitos — precisamente o tipo de análise que ferramentas de telemetria como o Aurora SIGER pretendem viabilizar.
 
-> **Fontes:** As referências completas dos parâmetros energéticos (SpaceX Crew Dragon Press Kit, NASA Orion MPCV, MIL-STD-704F, *Space Mission Engineering: The New SMAD*) encontram-se na secção **"Parâmetros energéticos"** do [README.md](README.md).
+---
+
+## Fontes dos parâmetros energéticos
+
+- **Capacidade total e autonomia da cápsula**: SpaceX Crew Dragon Press Kit; NASA Orion MPCV Reference Mission.
+- **Barramento principal de 28 VDC e perdas de conversão**: MIL-STD-704F — *Aircraft Electric Power Characteristics*.
+- **Modelo geral de orçamento energético orbital**: WERTZ, J. R.; EVERETT, D. F.; PUSCHELL, J. J. *Space Mission Engineering: The New SMAD*. Microcosm Press, 2011.
+- **Limiar de carga pré-lançamento (≥ 97 %)**: prática operacional documentada em missões tripuladas Soyuz e Crew Dragon.

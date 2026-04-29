@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aurora-siger"
-version = "0.1.0"
-description = "Sistema Inteligente de Gerenciamento de Riscos para telemetria de decolagem espacial"
+version = "0.2.0"
+description = "Sistema Inteligente de Gerenciamento de Riscos — telemetria de decolagem e pouso de módulos espaciais"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"

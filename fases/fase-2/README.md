@@ -1,55 +1,50 @@
-# MGPEB — Módulo de Gerenciamento de Pouso e Estabilização de Base
+# Fase 2 — MGPEB
 
-Protótipo em Python e relatório técnico do sistema de gerenciamento de pouso de 12 módulos da colônia **Aurora Siger** em Marte.
+**Módulo de Gerenciamento de Pouso e Estabilização de Base**
 
-Atividade Integradora da Fase 2 — Ciência da Computação, FIAP (2026).
+Esta fase entrega o sistema responsável por organizar o pouso dos doze módulos pré-fabricados que constituem a primeira colônia humana em Marte — a missão **Aurora Siger**. A coordenação manual seria inviável: o atraso de comunicação entre Terra e Marte varia de 4 a 24 minutos por sentido, e a fase de pouso dura poucos minutos. O MGPEB resolve isso com três funções complementares — organizar a fila, decidir caso a caso, registrar cada decisão.
 
-## Entregáveis
+## O que demonstra
 
-| Arquivo | Descrição |
-|---------|-----------|
-| `relatorio.pdf` | Relatório técnico final em PDF |
-| `mgpeb.py` | Protótipo do MGPEB em Python |
-| `relatorio.md` | Fonte Markdown do relatório (renderizado em `relatorio.pdf`) |
+- **Estruturas de dados lineares** — `Vector`, `Queue` (FIFO) e `Stack` (LIFO) implementadas do zero, com ordenação Bubble/Selection e busca linear.
+- **Lógica booleana inspecionável** — a regra de autorização `F ∧ A ∧ (L ∨ E) ∧ S` combina cinco variáveis (combustível, atmosfera, zona livre, emergência, sensores) e pode ser auditada por tabela-verdade.
+- **Funções matemáticas aplicadas** — quatro modelos físicos do pouso: altitude (queda livre), consumo de combustível (exponencial), energia solar (parábola invertida) e temperatura superficial (senoidal).
+- **Rastreabilidade** — toda decisão de bloqueio é empilhada com motivo e horário em uma `alert_stack` consultável.
 
-## Estrutura do repositório
+A arquitetura e o argumento por trás dessas escolhas estão no relatório (`relatorio.pdf`) e nos ensaios em [`docs/fase-2/`](../../docs/fase-2/).
 
-```
-.
-├── README.md
-├── LICENSE
-├── enunciado-atividade-integradora.md   # enunciado original da atividade
-├── mgpeb.py                             # protótipo executável do MGPEB
-├── relatorio.md                         # fonte Markdown do relatório
-├── relatorio.pdf                        # PDF final renderizado
-├── contextualizacao-historica.md        # texto-fonte da Seção 5 do relatório
-├── esg.md                               # texto-fonte da Seção 6 do relatório
-└── figuras/
-    ├── portas_logicas.dot/.png          # Figura 1 — diagrama de portas lógicas
-    ├── gate_and.svg, gate_or.svg        # símbolos ANSI/IEEE referenciados pelo .dot
-    ├── func_altitude.png                # Figura 2a — altitude de descida
-    ├── func_combustivel.png             # Figura 2b — consumo de combustível
-    ├── func_solar.png                   # Figura 3a — energia solar
-    ├── func_temperatura.png             # Figura 3b — temperatura superficial
-    ├── hierarquia_estruturas.dot/.png   # Figura A.1 — herança UML
-    ├── gerar_graficos.py                # script reproduzível dos gráficos matplotlib
-    └── header.tex                       # header LaTeX para o pacote subcaption
-```
+## Como rodar
 
-## Como executar o protótipo
+Há duas maneiras de explorar o sistema:
 
 ```bash
-python3 mgpeb.py
+# 1. Notebook interativo — narrativa + matplotlib + cenários comparados
+jupyter notebook fases/fase-2/notebook.ipynb
+
+# 2. Protótipo CLI — menu interativo com todas as operações
+python3 fases/fase-2/mgpeb.py
 ```
 
-Sem dependências externas — usa apenas `math` e `random` da biblioteca padrão.
+O CLI não tem dependências externas (usa só `math` e `random` da stdlib). O notebook usa `matplotlib`, instalado via `pip install -e ".[viz]"` na raiz do repositório.
 
-## Como regerar o PDF do relatório
+## Entregáveis desta pasta
 
-Requisitos: [Pandoc](https://pandoc.org/), uma distribuição LaTeX com `xelatex` (ex. [BasicTeX](https://tug.org/mactex/morepackages.html)), [matplotlib](https://matplotlib.org/) e [GraphViz](https://graphviz.org/).
+| Arquivo | O que é |
+|---------|---------|
+| `notebook.ipynb` | Narrativa demonstrativa com cenários (atmosfera ruim, frota com pouco combustível, todos críticos) e gráficos das funções físicas |
+| `mgpeb.py` | Protótipo CLI executável — *thin wrapper* sobre `aurora_siger.landing` |
+| `relatorio.md` / `relatorio.pdf` | Relatório técnico final da entrega FIAP, em fonte Markdown e PDF renderizado |
+| `enunciado-atividade-integradora.md` | Enunciado original da atividade |
+| `figuras/` | Diagramas (`portas_logicas`, `hierarquia_estruturas`) e gráficos das funções físicas, com o script `gerar_graficos.py` que os reproduz |
+
+Os ensaios fonte das Seções 5 e 6 do relatório (contextualização histórica e ESG) vivem em [`../../docs/fase-2/`](../../docs/fase-2/), seguindo a convenção do projeto: textos em `docs/`, código em `aurora_siger/`, demonstração em `fases/`.
+
+## Reproduzindo o PDF do relatório
+
+Requisitos: [Pandoc](https://pandoc.org/), distribuição LaTeX com `xelatex` (ex.: [BasicTeX](https://tug.org/mactex/morepackages.html)), [matplotlib](https://matplotlib.org/) e [GraphViz](https://graphviz.org/).
 
 ```bash
-# (opcional) regerar gráficos matplotlib
+# (opcional) regerar gráficos matplotlib das funções físicas
 python3 figuras/gerar_graficos.py
 
 # (opcional) regerar diagramas GraphViz
@@ -68,15 +63,19 @@ pandoc relatorio.md -o relatorio.pdf \
   --include-in-header=figuras/header.tex
 ```
 
-## Equipe
+## Equipe da entrega FIAP
+
+A atividade integradora foi submetida formalmente como trabalho de equipe pela disciplina:
 
 | Nome | RM | E-mail |
 |------|----|--------|
-| Gabriel Carmona Bittencourt | RM569239 | gabrielcarmabittencourtpy@gmail.com |
+| Gabriel Carmona Bittencourt | RM569239 | gabrielcarmonabittencourtpy@gmail.com |
 | Carlos Eugênio Rodrigues de Andrade Filho | RM570285 | carloseugenioprofissional@gmail.com |
 | Marcio Francisco dos Santos Junior | RM570758 | marciofsantos65@gmail.com |
 | Iúri Leão de Almeida | RM570215 | iurileao@gmail.com |
 | Maria Sophia Domingues dos Santos | RM571209 | maria.sophia.domingues@gmail.com |
+
+Os autores que mantêm o software a longo prazo no repositório [Aurora SIGER](../../README.md#autores) são um subconjunto desta lista.
 
 ## Licença
 

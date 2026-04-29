@@ -1,6 +1,6 @@
 # Quem decide quando a máquina decide?
 
-*Sobre ética, automação e os limites do progresso — do algoritmo que nega seu crédito ao satélite que monitora o clima."*
+*Sobre ética, automação e os limites do progresso — do algoritmo que nega seu crédito ao satélite que monitora o clima.*
 
 ---
 
