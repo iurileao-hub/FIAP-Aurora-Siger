@@ -58,6 +58,7 @@ dev = [
 
 [project.scripts]
 mgpeb = "aurora_siger.landing.cli:main"
+aurora = "aurora_siger.operations.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/iurileao-hub/FIAP-Aurora-Siger"
