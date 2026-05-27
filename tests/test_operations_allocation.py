@@ -66,3 +66,21 @@ def test_allocation_default_power_factor_matches_m1():
     allocate_energy(tree, supply_kw=20.0, climate=WARM)  # no power_factor arg
     assert find_module(12)["current_mode"] == "off"
     assert find_module(1)["current_mode"] != "off"
+
+
+def test_broken_module_excluded_from_allocation():
+    # A broken module is out of consumption (§3.6), so the allocator must not
+    # budget for it: it is skipped entirely (its mode is left untouched, not
+    # reset to 'adequate' by stage 1), while operational modules are sized as
+    # if it were absent. This keeps the allocator's demand estimate in step
+    # with the real draw, which also skips broken modules.
+    for mid in range(1, 14):
+        find_module(mid)["current_mode"] = "adequate"
+    find_module(12)["current_mode"] = "off"   # distinctive sentinel
+    find_module(12)["broken"] = True
+    tree = build_criticality_tree()
+    allocate_energy(tree, supply_kw=10_000, climate=WARM)  # abundant supply
+    # the broken module is untouched (would be set to 'adequate' if included)
+    assert find_module(12)["current_mode"] == "off"
+    # operational modules are still allocated normally
+    assert find_module(1)["current_mode"] in ("adequate", "surplus")

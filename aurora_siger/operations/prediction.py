@@ -82,7 +82,7 @@ def predict_next_wind_power(history, wind_forecast_ms):
     return wind_power_forecast(a, b, wind_forecast_ms)
 
 
-def fit_energy_trend(deltas):
+def fit_energy_trend(deltas: list) -> tuple:
     """Second use of the single OLS estimator (§3.2): fits the recent
     generation-minus-consumption deltas to a line and returns
     (slope, predicted_next_delta).

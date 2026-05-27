@@ -15,6 +15,8 @@ def test_base_levels_from_battery_pct():
 def test_steep_negative_slope_downgrades_one_step():
     # NOMINAL/HIGH/SURPLUS collapse to LOW under a steep drop
     assert energy_level(60.0, slope=-3.0, predicted_delta=5.0) == "LOW"
+    # even a full battery (SURPLUS) collapses to LOW under a steep drop
+    assert energy_level(95.0, slope=-3.0, predicted_delta=0.0) == "LOW"
     # LOW collapses to CRITICAL
     assert energy_level(30.0, slope=-3.0, predicted_delta=0.0) == "CRITICAL"
 

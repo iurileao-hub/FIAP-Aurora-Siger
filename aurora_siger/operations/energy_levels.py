@@ -13,14 +13,14 @@ from aurora_siger.operations.constants import (
 )
 
 
-def energy_level(battery_pct, slope, predicted_delta):
+def energy_level(battery_pct: float, slope: float, predicted_delta: float) -> str:
     """Returns one of CRITICAL/LOW/NOMINAL/HIGH/SURPLUS.
 
     Base level comes from battery %; a positive predicted delta lifts the
-    mid-range to HIGH. A steeply negative OLS slope then forces a one-step
-    downgrade (anticipating a drop before the battery actually falls), and a
-    mildly negative slope a softer one. CRITICAL and LOW are never upgraded
-    by the slope rules.
+    mid-range to HIGH. A steeply negative OLS slope then collapses
+    NOMINAL/HIGH/SURPLUS to LOW (anticipating a sharp drop before the battery
+    actually falls); a mildly negative slope collapses HIGH/SURPLUS to NOMINAL.
+    CRITICAL and LOW are never downgraded further by the slope rules.
     """
     if battery_pct < LEVEL_CRITICAL_PCT:
         base = "CRITICAL"

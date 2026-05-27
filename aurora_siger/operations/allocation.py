@@ -13,9 +13,10 @@ this function, in state.py / simulator.py).
 
 from aurora_siger.operations.constants import CRITICALITY_LEVELS, GENERATOR_TYPES
 from aurora_siger.operations.consumption import heating_consumption_kw
+from aurora_siger.operations.failures import is_operational
 
 
-def power_factor(battery_pct):
+def power_factor(battery_pct: float) -> float:
     """First control layer (§3.3): a smooth throttle on the consumption target
     as the battery drains. Piecewise-linear, harvested from the team `main`
     branch (colonia_aurora/energy/energy_manager.py::_compute_power_factor):
@@ -30,7 +31,7 @@ def power_factor(battery_pct):
     return 0.2
 
 
-def _consumption_at_mode(module, mode, climate, power_factor=1.0):
+def _consumption_at_mode(module: dict, mode: str, climate: dict, power_factor: float = 1.0) -> float:
     """Consumption of the module IF it were in `mode` (does not mutate).
 
     Mirrors consumption.current_consumption_kw: the per-mode base scales by
@@ -41,13 +42,21 @@ def _consumption_at_mode(module, mode, climate, power_factor=1.0):
     return base + extra
 
 
-def _leaves_by_level(tree):
-    """Returns (consumers_by_level, generators)."""
+def _leaves_by_level(tree) -> tuple[dict, list]:
+    """Returns (consumers_by_level, generators), excluding broken modules.
+
+    Broken modules are out of generation/consumption (§3.6), so the allocator
+    must not budget for them either — otherwise its demand estimate would
+    diverge from the real draw the simulator computes (which skips broken
+    modules), causing unnecessary load shedding during failures.
+    """
     levels = {}
     generators = []
     for level_child in tree.children:
         consumers = []
         for m in level_child.leaves():
+            if not is_operational(m):
+                continue
             (generators if m["type"] in GENERATOR_TYPES else consumers).append(m)
         # sort by id (smaller = higher priority) for consistent tie-breaking
         consumers.sort(key=lambda m: m["id"])
@@ -55,7 +64,7 @@ def _leaves_by_level(tree):
     return levels, generators
 
 
-def allocate_energy(criticality_tree, supply_kw, climate, power_factor=1.0):
+def allocate_energy(criticality_tree, supply_kw: float, climate: dict, power_factor: float = 1.0) -> None:
     """Applies the 4-stage policy. Mutates module['current_mode'] in place.
 
     `power_factor` (the first control layer, §3.3) scales the per-mode target

@@ -32,7 +32,7 @@ def heating_consumption_kw(external_temperature, thermal_factor):
     return net_W / ETA_HEATER / 1000.0
 
 
-def current_consumption_kw(module, climate, power_factor=1.0):
+def current_consumption_kw(module: dict, climate: dict, power_factor: float = 1.0) -> float:
     """Total consumption of the module right now (kW).
 
     `power_factor` (the first control layer, §3.4) throttles the per-mode base

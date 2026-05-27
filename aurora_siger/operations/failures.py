@@ -16,14 +16,15 @@ Both default to absent → operational, so callers need not pre-initialize them
 from aurora_siger.operations.constants import (
     FAILURE_PROB_PER_HOUR, REPAIR_DURATION_HOURS,
 )
+from aurora_siger.operations.rng import RandomLCG
 
 
-def is_operational(module):
+def is_operational(module: dict) -> bool:
     """A module is operational unless it is currently broken."""
     return not module.get("broken", False)
 
 
-def maybe_fail(module, rng):
+def maybe_fail(module: dict, rng: RandomLCG) -> bool:
     """Rolls a failure for one operational module (one hour).
 
     On failure: marks it broken and samples a repair countdown. Returns True
@@ -40,7 +41,7 @@ def maybe_fail(module, rng):
     return False
 
 
-def advance_repair(module):
+def advance_repair(module: dict) -> bool:
     """Ticks a broken module's repair timer by one hour; restores it when the
     countdown reaches 0. Returns True iff it just came back online. A no-op on
     operational modules (returns False).
