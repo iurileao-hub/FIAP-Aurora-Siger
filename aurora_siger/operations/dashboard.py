@@ -296,3 +296,56 @@ def screen_hierarquia(snap, w, h):
             if len(lines) >= h - 1:
                 return lines
     return lines
+
+
+TABS = [
+    ("Overview", "1", screen_overview),
+    ("Energia", "2", screen_energia),
+    ("Módulos", "3", screen_modulos),
+    ("Sensores", "4", screen_sensores),
+    ("Eventos", "5", screen_eventos),
+    ("Hierarquia", "6", screen_hierarquia),
+]
+
+
+def _tab_bar(active_idx):
+    cells = []
+    for i, (name, key, _) in enumerate(TABS):
+        if i == active_idx:
+            cells.append(f"{BOLD}{AMBER}[{key}:{name}]{RESET}")
+        else:
+            cells.append(f"{GRAY}{key}:{name}{RESET}")
+    return "  ".join(cells)
+
+
+def render_frame(snap, tab_idx):
+    """Builds the full dashboard frame as one positioned ANSI string.
+
+    Pure: given a SimSnapshot and the active tab index, returns the buffer the
+    runtime would write. Out-of-range tab indices are clamped defensively.
+    """
+    tab_idx = tab_idx % len(TABS) if TABS else 0
+    name, _, screen = TABS[tab_idx]
+    level = snap.get("energy_level", "NOMINAL")
+    lc = LEVEL_CLR.get(level, WHITE)
+    sol = snap.get("sol", 0)
+    hour = snap.get("hour", 0)
+    tick = snap.get("tick", 0)
+
+    buf = []
+    buf.append(clr())
+    buf.append(at(1, 2,
+                  f"{BOLD}{AMBER}AURORA SIGER{RESET}  {GRAY}colônia operando{RESET}   "
+                  f"{GRAY}sol {sol}  {hour:02d}:00   passo {tick}{RESET}   "
+                  f"{GRAY}energia:{RESET} {lc}{level}{RESET}"))
+    buf.append(at(2, 2, _tab_bar(tab_idx)))
+    buf.append(at(3, 2, DIM_C + HLINE * CONTENT_W + RESET))
+
+    body = screen(snap, CONTENT_W, CONTENT_H)
+    for i, line in enumerate(body[:CONTENT_H]):
+        buf.append(at(5 + i, 1, line))
+
+    footer_row = 5 + CONTENT_H + 1
+    buf.append(at(footer_row, 2,
+                  f"{GRAY}←/→ ou 1–6: abas   p: pausa   q: sair{RESET}"))
+    return "".join(buf)

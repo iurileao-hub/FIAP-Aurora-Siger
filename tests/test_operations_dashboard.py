@@ -107,3 +107,35 @@ def test_part2_screens_handle_fresh_state():
     fresh = SimSnapshot(init_simulation(seed=1))
     for screen in (screen_modulos, screen_eventos, screen_hierarquia):
         assert isinstance(screen(fresh, CONTENT_W, CONTENT_H), list)
+
+
+# Task 6: Frame composer + 6-tab navigation
+from aurora_siger.operations.dashboard import render_frame, TABS
+
+
+def test_tabs_are_six_with_hierarquia():
+    names = [t[0] for t in TABS]
+    assert len(TABS) == 6
+    assert "Hierarquia" in names and "Crew" not in names
+
+
+def test_render_frame_returns_string_with_active_tab_content():
+    snap = _snap()
+    frame = render_frame(snap, tab_idx=0)        # Overview
+    assert isinstance(frame, str) and frame
+    assert "Bateria" in strip_ansi(frame)
+    for t in TABS:
+        assert t[0] in strip_ansi(frame)
+
+
+def test_render_frame_each_tab_smoke():
+    snap = _snap()
+    for idx in range(len(TABS)):
+        frame = render_frame(snap, tab_idx=idx)
+        assert isinstance(frame, str) and len(frame) > 0
+
+
+def test_render_frame_clamps_tab_index():
+    snap = _snap()
+    # out-of-range index must not raise (defensive)
+    assert isinstance(render_frame(snap, tab_idx=99), str)
