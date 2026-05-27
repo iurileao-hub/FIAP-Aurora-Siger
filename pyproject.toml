@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aurora-siger"
-version = "0.2.0"
-description = "Sistema Inteligente de Gerenciamento de Riscos — telemetria de decolagem e pouso de módulos espaciais"
+version = "0.3.0"
+description = "Sistema Inteligente de Gerenciamento de Riscos — telemetria de decolagem, pouso de módulos e operação energética de colônia espacial"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
@@ -19,9 +19,12 @@ keywords = [
     "boolean-logic",
     "data-structures",
     "education",
+    "energy-management",
     "fiap",
     "isolation-forest",
     "linear-data-structures",
+    "ols-regression",
+    "simulation",
     "telemetry",
 ]
 classifiers = [
