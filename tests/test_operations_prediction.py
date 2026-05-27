@@ -1,7 +1,7 @@
 import pytest
 from aurora_siger.operations.prediction import (
     linear_regression, predict, fit_wind_power_model,
-    wind_power_forecast, predict_next_wind_power,
+    wind_power_forecast, predict_next_wind_power, fit_energy_trend,
 )
 
 
@@ -47,3 +47,25 @@ def test_predict_next_wind_power_end_to_end():
         "wind_generation_kw": [10.0, 20.0, 30.0],
     }
     assert predict_next_wind_power(history, 12.0) > 30.0
+
+
+def test_fit_energy_trend_positive_when_rising():
+    slope, predicted = fit_energy_trend([1.0, 2.0, 3.0, 4.0])
+    assert slope > 0
+    assert predicted > 4.0  # extrapolates the next point
+
+
+def test_fit_energy_trend_negative_when_falling():
+    slope, _ = fit_energy_trend([4.0, 3.0, 2.0, 1.0])
+    assert slope < 0
+
+
+def test_fit_energy_trend_flat_series_is_zero_slope():
+    slope, predicted = fit_energy_trend([5.0, 5.0, 5.0])
+    assert abs(slope) < 1e-9
+    assert abs(predicted - 5.0) < 1e-9
+
+
+def test_fit_energy_trend_degenerate_short_input():
+    assert fit_energy_trend([]) == (0.0, 0.0)
+    assert fit_energy_trend([7.0]) == (0.0, 7.0)

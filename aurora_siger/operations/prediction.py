@@ -80,3 +80,24 @@ def predict_next_wind_power(history, wind_forecast_ms):
     """Fits and forecasts in a single call. Convenience wrapper."""
     a, b = fit_wind_power_model(history)
     return wind_power_forecast(a, b, wind_forecast_ms)
+
+
+def fit_energy_trend(deltas):
+    """Second use of the single OLS estimator (§3.2): fits the recent
+    generation-minus-consumption deltas to a line and returns
+    (slope, predicted_next_delta).
+
+    `slope` is the OLS coefficient `a` (kW per step); `predicted_next_delta`
+    is the line evaluated one step past the data. This replaces the team
+    `main` branch's gradient-descent trend with the closed-form fit.
+
+    Degenerate input (fewer than 2 points, or a constant series with zero
+    x-variance never occurs here since xs = 0..n-1) returns a zero slope and
+    the last observed value as the prediction, so callers never see a raise.
+    """
+    n = len(deltas)
+    if n < 2:
+        return 0.0, (deltas[-1] if deltas else 0.0)
+    xs = list(range(n))
+    a, b = linear_regression(xs, deltas)
+    return a, predict(a, b, n)
