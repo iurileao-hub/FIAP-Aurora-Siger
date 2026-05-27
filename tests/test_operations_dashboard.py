@@ -46,7 +46,7 @@ def test_miniline_shape():
 
 # Task 4: Three screen renderers
 from aurora_siger.operations.dashboard import (
-    screen_overview, screen_energia, screen_sensores, CONTENT_W, CONTENT_H,
+    screen_overview, screen_energy, screen_sensors, CONTENT_W, CONTENT_H,
 )
 from aurora_siger.operations.simulator import init_simulation, step
 from aurora_siger.operations.simsnapshot import SimSnapshot
@@ -67,45 +67,45 @@ def test_overview_renders_lines_with_battery_label():
 
 
 def test_energia_shows_generation_sources():
-    blob = strip_ansi("".join(screen_energia(_snap(), CONTENT_W, CONTENT_H)))
+    blob = strip_ansi("".join(screen_energy(_snap(), CONTENT_W, CONTENT_H)))
     assert "Solar" in blob and "Eólica" in blob and "Nuclear" in blob
 
 
 def test_sensores_shows_climate_fields():
-    blob = strip_ansi("".join(screen_sensores(_snap(), CONTENT_W, CONTENT_H)))
+    blob = strip_ansi("".join(screen_sensors(_snap(), CONTENT_W, CONTENT_H)))
     assert "Temperatura" in blob and "Vento" in blob and "tau" in blob.lower()
 
 
 def test_screens_handle_fresh_state_without_crashing():
     fresh = SimSnapshot(init_simulation(seed=1))  # nothing stepped
-    for screen in (screen_overview, screen_energia, screen_sensores):
+    for screen in (screen_overview, screen_energy, screen_sensors):
         assert isinstance(screen(fresh, CONTENT_W, CONTENT_H), list)
 
 
 # Task 5: Three more screen renderers (Módulos, Eventos, Hierarquia)
 from aurora_siger.operations.dashboard import (
-    screen_modulos, screen_eventos, screen_hierarquia,
+    screen_modules, screen_events, screen_hierarchy,
 )
 
 
 def test_modulos_lists_all_thirteen():
-    blob = strip_ansi("".join(screen_modulos(_snap(), CONTENT_W, CONTENT_H)))
+    blob = strip_ansi("".join(screen_modules(_snap(), CONTENT_W, CONTENT_H)))
     assert "13 total" in blob or "/ 13" in blob
 
 
 def test_eventos_mentions_storm_and_failures():
-    blob = strip_ansi("".join(screen_eventos(_snap(), CONTENT_W, CONTENT_H)))
+    blob = strip_ansi("".join(screen_events(_snap(), CONTENT_W, CONTENT_H)))
     assert "Tempestade" in blob or "Frente fria" in blob or "Falha" in blob
 
 
 def test_hierarquia_renders_three_criticality_levels():
-    blob = strip_ansi("".join(screen_hierarquia(_snap(), CONTENT_W, CONTENT_H)))
+    blob = strip_ansi("".join(screen_hierarchy(_snap(), CONTENT_W, CONTENT_H)))
     assert "Vital" in blob and "Sustenance" in blob and "Expansion" in blob
 
 
 def test_part2_screens_handle_fresh_state():
     fresh = SimSnapshot(init_simulation(seed=1))
-    for screen in (screen_modulos, screen_eventos, screen_hierarquia):
+    for screen in (screen_modules, screen_events, screen_hierarchy):
         assert isinstance(screen(fresh, CONTENT_W, CONTENT_H), list)
 
 

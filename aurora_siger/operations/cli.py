@@ -10,7 +10,6 @@ frame without touching the terminal, for smoke tests and CI.
 import argparse
 import sys
 import threading
-import time
 
 from aurora_siger.operations.dashboard import (
     render_frame, strip_ansi, TABS, hide_cur, show_cur, alt_screen, norm_screen,
@@ -19,7 +18,7 @@ from aurora_siger.operations.simulator import init_simulation, step, TOTAL_STEPS
 from aurora_siger.operations.simsnapshot import SimSnapshot
 
 
-def _run_headless(seed, frames, plain):
+def _run_headless(seed: int, frames: int, plain: bool) -> int:
     """Steps `frames` times and prints the final Overview frame. No raw TTY."""
     state = init_simulation(seed)
     for _ in range(min(frames, TOTAL_STEPS)):
@@ -29,7 +28,7 @@ def _run_headless(seed, frames, plain):
     return 0
 
 
-def _run_live(seed, tick_seconds):
+def _run_live(seed: int, tick_seconds: float) -> int:
     """Live loop: sim in a daemon thread, raw-mode keyboard nav in the main
     thread. Falls back to headless if stdin is not a TTY."""
     import select
@@ -86,7 +85,7 @@ def _run_live(seed, tick_seconds):
     return 0
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="aurora", description="Aurora Siger live dashboard")
     parser.add_argument("--seed", type=int, default=42, help="RNG seed (deterministic)")
     parser.add_argument("--tick", type=float, default=0.4, help="seconds per simulated hour (live)")

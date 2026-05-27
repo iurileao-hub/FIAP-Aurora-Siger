@@ -9,6 +9,10 @@ read our simulator's data instead of the team's DataStorage singleton.
 
 import re
 import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # avoid coupling this presentation module to the data adapter
+    from aurora_siger.operations.simsnapshot import SimSnapshot
 
 # --- ANSI palette / control (harvested from `main`) ---
 ESC = "\033"
@@ -156,7 +160,7 @@ def _bar_line(label, value, unit, val, mx, color, w):
     return f"  {GRAY}{label:<14}{RESET}{bar} {color}{value}{unit}{RESET}"
 
 
-def screen_overview(snap, w, h):
+def screen_overview(snap: "SimSnapshot", w: int, h: int) -> list[str]:
     level = snap.get("energy_level", "NOMINAL")
     lc = LEVEL_CLR.get(level, WHITE)
     pct = snap.get("battery_pct", 0.0)
@@ -178,7 +182,7 @@ def screen_overview(snap, w, h):
     return lines
 
 
-def screen_energia(snap, w, h):
+def screen_energy(snap: "SimSnapshot", w: int, h: int) -> list[str]:
     gen = snap.get("generation_kw", 0.0)
     solar = snap.get("solar_kw", 0.0)
     wind = snap.get("wind_kw", 0.0)
@@ -202,7 +206,7 @@ def screen_energia(snap, w, h):
     return lines
 
 
-def screen_sensores(snap, w, h):
+def screen_sensors(snap: "SimSnapshot", w: int, h: int) -> list[str]:
     temp = snap.get("temperature_c", 0.0)
     wind = snap.get("wind_ms", 0.0)
     tau = snap.get("tau", 0.0)
@@ -225,7 +229,7 @@ def screen_sensores(snap, w, h):
 _MODE_CLR = {"surplus": TEAL, "adequate": GREEN, "minimum": YELLOW, "off": DIM_C}
 
 
-def screen_modulos(snap, w, h):
+def screen_modules(snap: "SimSnapshot", w: int, h: int) -> list[str]:
     mods = snap.modules()
     active = sum(1 for m in mods if m["active"])
     lines = []
@@ -253,7 +257,7 @@ def screen_modulos(snap, w, h):
     return lines
 
 
-def screen_eventos(snap, w, h):
+def screen_events(snap: "SimSnapshot", w: int, h: int) -> list[str]:
     storm = snap.get("storm", "clear")
     temp = snap.get("temperature_c", 0.0)
     broken = snap.get("broken_count", 0)
@@ -275,7 +279,7 @@ def screen_eventos(snap, w, h):
     return lines
 
 
-def screen_hierarquia(snap, w, h):
+def screen_hierarchy(snap: "SimSnapshot", w: int, h: int) -> list[str]:
     """Tab 6: the criticality tree live — item 1.1 visualized (replaces Crew)."""
     root = snap.criticality_tree()
     lines = []
@@ -298,13 +302,15 @@ def screen_hierarquia(snap, w, h):
     return lines
 
 
+# Display labels stay in Portuguese (product UI); function identifiers are
+# English per the package naming convention.
 TABS = [
     ("Overview", "1", screen_overview),
-    ("Energia", "2", screen_energia),
-    ("Módulos", "3", screen_modulos),
-    ("Sensores", "4", screen_sensores),
-    ("Eventos", "5", screen_eventos),
-    ("Hierarquia", "6", screen_hierarquia),
+    ("Energia", "2", screen_energy),
+    ("Módulos", "3", screen_modules),
+    ("Sensores", "4", screen_sensors),
+    ("Eventos", "5", screen_events),
+    ("Hierarquia", "6", screen_hierarchy),
 ]
 
 
@@ -318,7 +324,7 @@ def _tab_bar(active_idx):
     return "  ".join(cells)
 
 
-def render_frame(snap, tab_idx):
+def render_frame(snap: "SimSnapshot", tab_idx: int) -> str:
     """Builds the full dashboard frame as one positioned ANSI string.
 
     Pure: given a SimSnapshot and the active tab index, returns the buffer the

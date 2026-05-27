@@ -180,7 +180,7 @@ def _reset_modules():
         m["current_mode"] = "adequate"
 
 
-def init_simulation(seed=42):
+def init_simulation(seed: int = 42) -> dict:
     """Builds a ready-to-step simulation state (does not run any step).
 
     Resets per-module runtime state so a fresh run never inherits a previous

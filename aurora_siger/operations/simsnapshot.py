@@ -12,8 +12,10 @@ table with derived operational status and current consumption. The snapshot
 never mutates state.
 """
 
+from aurora_siger.operations.allocation import power_factor
 from aurora_siger.operations.consumption import current_consumption_kw
 from aurora_siger.operations.failures import is_operational
+from aurora_siger.operations.tree import Node
 
 # Scalars read live from climate/battery (always present).
 _LIVE = {
@@ -49,10 +51,10 @@ _LATEST = {
 class SimSnapshot:
     """Read-only view over a simulator `state` dict."""
 
-    def __init__(self, state):
+    def __init__(self, state: dict) -> None:
         self._state = state
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: object = None) -> object:
         st = self._state
         if key in _LIVE:
             return _LIVE[key](st)
@@ -61,17 +63,28 @@ class SimSnapshot:
             return series[-1] if series else default
         return default
 
-    def history(self, series_key, last_n=None):
+    def history(self, series_key: str, last_n: int | None = None) -> list:
         """Recent window of a history series (by its HISTORY_KEYS name)."""
         series = self._state["history"].get(series_key, [])
         if last_n is None:
             return list(series)
         return list(series)[-last_n:]
 
-    def modules(self):
-        """Module table with derived operational status and live consumption."""
+    def modules(self) -> list[dict]:
+        """Module table with derived operational status and live consumption.
+
+        The per-module consumption mirrors the simulator's first control layer:
+        it is scaled by the battery-driven power_factor (§3.4), so the table
+        agrees with the throttled total shown elsewhere instead of overstating
+        the draw by up to 5x when the battery is low.
+        """
         from aurora_siger.operations.modules import MODULES
         climate = self._state["climate"]
+        battery = self._state["battery"]
+        battery_pct = (
+            battery["current_charge_kwh"] / battery["max_capacity_kwh"] * 100.0
+        )
+        pf = power_factor(battery_pct)
         rows = []
         for m in MODULES:
             active = is_operational(m)
@@ -80,12 +93,15 @@ class SimSnapshot:
                 "name": m["name"],
                 "type": m["type"],
                 "current_mode": m["current_mode"],
-                "consumption_kw": current_consumption_kw(m, climate) if active else 0.0,
+                "consumption_kw": (
+                    current_consumption_kw(m, climate, power_factor=pf)
+                    if active else 0.0
+                ),
                 "active": active,
                 "broken": m.get("broken", False),
             })
         return rows
 
-    def criticality_tree(self):
+    def criticality_tree(self) -> Node:
         """The live criticality tree (Vital → Sustenance → Expansion)."""
         return self._state["criticality_tree"]
