@@ -148,3 +148,75 @@ def miniline(vals, w, h):
                 row += DIM_C + " " + RESET
         rows.append(row)
     return rows
+
+
+def _bar_line(label, value, unit, val, mx, color, w):
+    """A labelled horizontal bar: 'Label  ███░░░  value unit'."""
+    bar = hbar(val, mx, max(10, w - 30), color)
+    return f"  {GRAY}{label:<14}{RESET}{bar} {color}{value}{unit}{RESET}"
+
+
+def screen_overview(snap, w, h):
+    level = snap.get("energy_level", "NOMINAL")
+    lc = LEVEL_CLR.get(level, WHITE)
+    pct = snap.get("battery_pct", 0.0)
+    gen = snap.get("generation_kw", 0.0)
+    con = snap.get("consumption_kw", 0.0)
+    pred = snap.get("predicted_delta", 0.0)
+    lines = []
+    lines.append(f"  {AMBER}Visão Geral{RESET}   {GRAY}Nível de energia:{RESET} {lc}{BOLD}{level}{RESET}")
+    lines.append(DIM_C + HLINE * w + RESET)
+    lines.append(_bar_line("Bateria", f"{pct:.0f}", "%", pct, 100.0, lc, w))
+    spark = sparkline(snap.history("battery_charge_kwh", 48), w=48, h=4)
+    for row in spark:
+        lines.append("    " + row)
+    lines.append("")
+    lines.append(f"  {GRAY}Geração:{GREEN}{gen:7.1f} kW{RESET}   "
+                 f"{GRAY}Consumo:{RED}{con:7.1f} kW{RESET}   "
+                 f"{GRAY}Saldo:{lc}{gen - con:+7.1f} kW{RESET}")
+    lines.append(f"  {GRAY}Delta previsto (OLS):{RESET} {lc}{pred:+.2f} kW{RESET}")
+    return lines
+
+
+def screen_energia(snap, w, h):
+    gen = snap.get("generation_kw", 0.0)
+    solar = snap.get("solar_kw", 0.0)
+    wind = snap.get("wind_kw", 0.0)
+    nuclear = snap.get("nuclear_kw", 0.0)
+    con = snap.get("consumption_kw", 0.0)
+    slope = snap.get("slope", 0.0)
+    mx = max(gen, con, 1.0)
+    lines = []
+    lines.append(f"  {AMBER}Energia{RESET}")
+    lines.append(DIM_C + HLINE * w + RESET)
+    lines.append(_bar_line("Solar", f"{solar:.1f}", " kW", solar, mx, YELLOW, w))
+    lines.append(_bar_line("Eólica", f"{wind:.1f}", " kW", wind, mx, TEAL, w))
+    lines.append(_bar_line("Nuclear", f"{nuclear:.1f}", " kW", nuclear, mx, PURPLE, w))
+    lines.append(_bar_line("Consumo", f"{con:.1f}", " kW", con, mx, RED, w))
+    lines.append("")
+    lines.append(f"  {GRAY}Geração total:{GREEN} {gen:.1f} kW{RESET}   "
+                 f"{GRAY}Tendência (slope OLS):{RESET} {slope:+.3f} kW/h")
+    spark = sparkline(snap.history("total_generation_kw", 48), w=48, h=4)
+    for row in spark:
+        lines.append("    " + row)
+    return lines
+
+
+def screen_sensores(snap, w, h):
+    temp = snap.get("temperature_c", 0.0)
+    wind = snap.get("wind_ms", 0.0)
+    tau = snap.get("tau", 0.0)
+    storm = snap.get("storm", "clear")
+    panel = snap.get("panel_factor", 1.0)
+    lines = []
+    lines.append(f"  {AMBER}Sensores e Clima{RESET}   {GRAY}tempestade:{RESET} {storm}")
+    lines.append(DIM_C + HLINE * w + RESET)
+    lines.append(f"  {GRAY}Temperatura:{RESET} {BLUE}{temp:7.1f} °C{RESET}")
+    lines.append(f"  {GRAY}Vento:{RESET}       {TEAL}{wind:7.1f} m/s{RESET}")
+    lines.append(f"  {GRAY}tau (opacidade):{RESET} {WHITE}{tau:5.2f}{RESET}")
+    lines.append(f"  {GRAY}Fator de painel:{RESET} {hbar(panel, 1.0, 30, AMBER)} {panel:.2f}")
+    lines.append("")
+    lines.append(f"  {GRAY}Vento (24 h){RESET}")
+    for row in miniline(snap.history("wind_ms", 48), w=48, h=4):
+        lines.append("    " + row)
+    return lines

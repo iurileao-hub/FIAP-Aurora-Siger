@@ -42,3 +42,41 @@ def test_miniline_shape():
     rows = miniline([1, 3, 2, 5, 4], w=5, h=3)
     assert len(rows) == 3
     assert all(len(strip_ansi(r)) == 5 for r in rows)
+
+
+# Task 4: Three screen renderers
+from aurora_siger.operations.dashboard import (
+    screen_overview, screen_energia, screen_sensores, CONTENT_W, CONTENT_H,
+)
+from aurora_siger.operations.simulator import init_simulation, step
+from aurora_siger.operations.simsnapshot import SimSnapshot
+
+
+def _snap(n=30):
+    state = init_simulation(seed=42)
+    for _ in range(n):
+        step(state)
+    return SimSnapshot(state)
+
+
+def test_overview_renders_lines_with_battery_label():
+    lines = screen_overview(_snap(), CONTENT_W, CONTENT_H)
+    assert isinstance(lines, list) and lines
+    blob = strip_ansi("".join(lines))
+    assert "Bateria" in blob and "Nível" in blob
+
+
+def test_energia_shows_generation_sources():
+    blob = strip_ansi("".join(screen_energia(_snap(), CONTENT_W, CONTENT_H)))
+    assert "Solar" in blob and "Eólica" in blob and "Nuclear" in blob
+
+
+def test_sensores_shows_climate_fields():
+    blob = strip_ansi("".join(screen_sensores(_snap(), CONTENT_W, CONTENT_H)))
+    assert "Temperatura" in blob and "Vento" in blob and "tau" in blob.lower()
+
+
+def test_screens_handle_fresh_state_without_crashing():
+    fresh = SimSnapshot(init_simulation(seed=1))  # nothing stepped
+    for screen in (screen_overview, screen_energia, screen_sensores):
+        assert isinstance(screen(fresh, CONTENT_W, CONTENT_H), list)
