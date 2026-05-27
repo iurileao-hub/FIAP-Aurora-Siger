@@ -8,9 +8,16 @@
 
 **Tech Stack:** Python 3.11+, stdlib apenas (`math`, `collections`), pytest. Sem numpy no pacote `operations`.
 
-**Repo de origem dos ports:** `/home/ubuntu/projects/fiap-aurora-siger-fase3`, branch `origin/iuri`, pacote `colony/`. Extração via `git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/<arquivo>.py`.
+**Trabalho corrente:** repo `/home/ubuntu/projects/FIAP-Aurora-Siger`, branch `main`. Todo o trabalho acontece aqui; o repo de equipe não é tocado.
 
-**Trabalho corrente:** repo `/home/ubuntu/projects/FIAP-Aurora-Siger`, branch `main`.
+**Pré-requisito — branches da equipe disponíveis como remote `team`:** os objetos das duas branches da equipe já foram trazidos para o `.git` deste repo, então os ports usam `git show team/iuri:colony/<arquivo>.py` e `git show team/main:colonia_aurora/<arquivo>.py` — sem depender do repo de equipe em runtime. Se `git show team/iuri:colony/tree.py` falhar (remote ausente num clone novo), recrie:
+
+```bash
+git remote add team /home/ubuntu/projects/fiap-aurora-siger-fase3
+git fetch team 'refs/remotes/origin/iuri:refs/remotes/team/iuri' \
+                'refs/remotes/origin/marcio:refs/remotes/team/marcio' \
+                'refs/heads/main:refs/remotes/team/main'
+```
 
 ---
 
@@ -267,7 +274,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port constants and append cold-front block**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/constants.py \
+git show team/iuri:colony/constants.py \
   | sed 's#docs/superpowers/specs/2026-05-14-organizacao-dados-colonia-design.md#docs/superpowers/specs/2026-05-27-fase-3-operations-consolidacao-design.md#' \
   > aurora_siger/operations/constants.py
 ```
@@ -347,7 +354,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port the file (verbatim — no internal `colony.` imports)**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/tree.py \
+git show team/iuri:colony/tree.py \
   > aurora_siger/operations/tree.py
 ```
 
@@ -409,7 +416,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port the file (verbatim — no internal imports)**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/modules.py \
+git show team/iuri:colony/modules.py \
   > aurora_siger/operations/modules.py
 ```
 
@@ -472,7 +479,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port with import rewrite**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/hierarchies.py \
+git show team/iuri:colony/hierarchies.py \
   | sed 's/from colony\./from aurora_siger.operations./g' \
   > aurora_siger/operations/hierarchies.py
 ```
@@ -753,7 +760,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port with import rewrite**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/generation.py \
+git show team/iuri:colony/generation.py \
   | sed 's/from colony\./from aurora_siger.operations./g' \
   > aurora_siger/operations/generation.py
 ```
@@ -824,7 +831,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port with import rewrite**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/consumption.py \
+git show team/iuri:colony/consumption.py \
   | sed 's/from colony\./from aurora_siger.operations./g' \
   > aurora_siger/operations/consumption.py
 ```
@@ -900,7 +907,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port with import rewrite**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/allocation.py \
+git show team/iuri:colony/allocation.py \
   | sed 's/from colony\./from aurora_siger.operations./g' \
   > aurora_siger/operations/allocation.py
 ```
@@ -957,7 +964,7 @@ Expected: FAIL with `ModuleNotFoundError`
 - [ ] **Step 3: Port with import rewrite**
 
 ```bash
-git -C /home/ubuntu/projects/fiap-aurora-siger-fase3 show origin/iuri:colony/state.py \
+git show team/iuri:colony/state.py \
   | sed 's/from colony\./from aurora_siger.operations./g' \
   > aurora_siger/operations/state.py
 ```
