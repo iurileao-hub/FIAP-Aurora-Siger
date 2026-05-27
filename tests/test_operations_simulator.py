@@ -25,8 +25,49 @@ def test_battery_stays_within_bounds():
     assert all(0.0 <= c <= battery["max_capacity_kwh"] for c in charges)
 
 
-def test_coldfront_recorded_when_it_fires():
-    # cold-front presence is derivable from temperature dips; just assert the
-    # run completes and temperature series has the expected length
+def test_temperature_series_has_full_horizon():
     _, _, history = run_simulation(seed=42, horizon=TOTAL_STEPS)
     assert len(history["temperature_c"]) == TOTAL_STEPS
+
+
+def test_step_applies_active_coldfront_offset_to_temperature():
+    """An active cold front shifts the recorded temperature by exactly
+    COLDFRONT_DELTA_C — the only M1-new wiring inside step().
+
+    We reproduce step()'s rng-consumption order (a wind draw, then a
+    temperature draw) with a probe of the same seed. Because an *active*
+    ColdFrontState.advance() draws no random numbers, the temperature recorded
+    by step() must equal the un-shifted base sample plus the cold-front offset.
+    """
+    from collections import deque
+
+    from aurora_siger.operations.simulator import step
+    from aurora_siger.operations.climate import (
+        StormState, ColdFrontState, sample_wind, sample_temperature,
+    )
+    from aurora_siger.operations.state import initial_state
+    from aurora_siger.operations.hierarchies import build_criticality_tree
+    from aurora_siger.operations.rng import RandomLCG
+    from aurora_siger.operations.constants import COLDFRONT_DELTA_C
+
+    probe = RandomLCG(123)
+    sample_wind(0, probe)                       # mirror step(): wind is drawn first
+    expected_base_temp = sample_temperature(0, 0, probe)
+
+    climate, battery, history = initial_state()
+    cold_front = ColdFrontState()
+    cold_front.active = True
+    cold_front.hours_remaining = 100            # stays active through this step
+    state = {
+        "climate": climate,
+        "battery": battery,
+        "history": history,
+        "criticality_tree": build_criticality_tree(),
+        "storm_state": StormState(),
+        "coldfront_state": cold_front,
+        "last_wind_24h": deque(maxlen=24),
+        "rng": RandomLCG(123),
+    }
+    step(state)
+
+    assert history["temperature_c"][0] == expected_base_temp + COLDFRONT_DELTA_C
