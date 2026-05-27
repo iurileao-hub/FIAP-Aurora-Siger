@@ -180,15 +180,17 @@ def _reset_modules():
         m["current_mode"] = "adequate"
 
 
-def run_simulation(seed=42, horizon=TOTAL_STEPS):
-    """Runs `horizon` hourly steps. Returns (climate, battery, history).
+def init_simulation(seed=42):
+    """Builds a ready-to-step simulation state (does not run any step).
 
-    seed=42 (default): deterministic. seed=None: entropy from the clock.
+    Resets per-module runtime state so a fresh run never inherits a previous
+    run's failures or modes (MODULES is module-level shared state). The live
+    CLI dashboard and run_simulation both build their state through here.
     """
     rng = RandomLCG(seed)
     _reset_modules()
     climate, battery, history = initial_state()
-    state = {
+    return {
         "climate": climate,
         "battery": battery,
         "history": history,
@@ -198,6 +200,14 @@ def run_simulation(seed=42, horizon=TOTAL_STEPS):
         "last_wind_24h": deque(maxlen=24),
         "rng": rng,
     }
+
+
+def run_simulation(seed=42, horizon=TOTAL_STEPS):
+    """Runs `horizon` hourly steps. Returns (climate, battery, history).
+
+    seed=42 (default): deterministic. seed=None: entropy from the clock.
+    """
+    state = init_simulation(seed)
     for _ in range(horizon):
         step(state)
-    return climate, battery, history
+    return state["climate"], state["battery"], state["history"]

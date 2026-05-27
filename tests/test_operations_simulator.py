@@ -105,3 +105,24 @@ def test_broken_count_within_module_count():
 def test_battery_still_within_bounds_under_m2():
     _, battery, h = run_simulation(seed=42, horizon=TOTAL_STEPS)
     assert all(0.0 <= c <= battery["max_capacity_kwh"] for c in h["battery_charge_kwh"])
+
+
+# --- M3 Task 1: init_simulation state builder ---
+
+def test_init_simulation_builds_ready_state():
+    from aurora_siger.operations.simulator import init_simulation, step
+    state = init_simulation(seed=42)
+    assert set(("climate", "battery", "history", "criticality_tree",
+                "storm_state", "coldfront_state", "last_wind_24h", "rng")) <= set(state)
+    assert state["history"]["total_generation_kw"] == []   # nothing stepped yet
+    step(state)
+    assert len(state["history"]["total_generation_kw"]) == 1
+
+
+def test_run_simulation_still_matches_manual_stepping():
+    from aurora_siger.operations.simulator import init_simulation, step
+    _, _, h_run = run_simulation(seed=42, horizon=24)
+    state = init_simulation(seed=42)
+    for _ in range(24):
+        step(state)
+    assert state["history"] == h_run
