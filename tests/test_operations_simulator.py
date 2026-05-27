@@ -71,3 +71,37 @@ def test_step_applies_active_coldfront_offset_to_temperature():
     step(state)
 
     assert history["temperature_c"][0] == expected_base_temp + COLDFRONT_DELTA_C
+
+
+# --- M2 tests ---
+from aurora_siger.operations.constants import ENERGY_LEVELS
+
+
+def test_m2_history_keys_populated():
+    _, _, h = run_simulation(seed=42, horizon=TOTAL_STEPS)
+    for key in ("energy_level", "slope", "predicted_delta", "broken_count"):
+        assert len(h[key]) == TOTAL_STEPS
+
+
+def test_energy_levels_are_valid_labels():
+    _, _, h = run_simulation(seed=42, horizon=TOTAL_STEPS)
+    assert set(h["energy_level"]) <= set(ENERGY_LEVELS)
+
+
+def test_determinism_holds_with_failures_and_control():
+    # The decisive M2 regression: failures mutate the shared MODULES dicts, so
+    # run_simulation MUST reset them — otherwise the second run inherits the
+    # first run's broken modules and h1 != h2.
+    _, _, h1 = run_simulation(seed=42, horizon=TOTAL_STEPS)
+    _, _, h2 = run_simulation(seed=42, horizon=TOTAL_STEPS)
+    assert h1 == h2
+
+
+def test_broken_count_within_module_count():
+    _, _, h = run_simulation(seed=42, horizon=TOTAL_STEPS)
+    assert all(0 <= b <= 13 for b in h["broken_count"])
+
+
+def test_battery_still_within_bounds_under_m2():
+    _, battery, h = run_simulation(seed=42, horizon=TOTAL_STEPS)
+    assert all(0.0 <= c <= battery["max_capacity_kwh"] for c in h["battery_charge_kwh"])
