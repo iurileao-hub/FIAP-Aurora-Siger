@@ -80,3 +80,30 @@ def test_screens_handle_fresh_state_without_crashing():
     fresh = SimSnapshot(init_simulation(seed=1))  # nothing stepped
     for screen in (screen_overview, screen_energia, screen_sensores):
         assert isinstance(screen(fresh, CONTENT_W, CONTENT_H), list)
+
+
+# Task 5: Three more screen renderers (Módulos, Eventos, Hierarquia)
+from aurora_siger.operations.dashboard import (
+    screen_modulos, screen_eventos, screen_hierarquia,
+)
+
+
+def test_modulos_lists_all_thirteen():
+    blob = strip_ansi("".join(screen_modulos(_snap(), CONTENT_W, CONTENT_H)))
+    assert "13 total" in blob or "/ 13" in blob
+
+
+def test_eventos_mentions_storm_and_failures():
+    blob = strip_ansi("".join(screen_eventos(_snap(), CONTENT_W, CONTENT_H)))
+    assert "Tempestade" in blob or "Frente fria" in blob or "Falha" in blob
+
+
+def test_hierarquia_renders_three_criticality_levels():
+    blob = strip_ansi("".join(screen_hierarquia(_snap(), CONTENT_W, CONTENT_H)))
+    assert "Vital" in blob and "Sustenance" in blob and "Expansion" in blob
+
+
+def test_part2_screens_handle_fresh_state():
+    fresh = SimSnapshot(init_simulation(seed=1))
+    for screen in (screen_modulos, screen_eventos, screen_hierarquia):
+        assert isinstance(screen(fresh, CONTENT_W, CONTENT_H), list)

@@ -220,3 +220,79 @@ def screen_sensores(snap, w, h):
     for row in miniline(snap.history("wind_ms", 48), w=48, h=4):
         lines.append("    " + row)
     return lines
+
+
+_MODE_CLR = {"surplus": TEAL, "adequate": GREEN, "minimum": YELLOW, "off": DIM_C}
+
+
+def screen_modulos(snap, w, h):
+    mods = snap.modules()
+    active = sum(1 for m in mods if m["active"])
+    lines = []
+    lines.append(f"  {AMBER}Módulos — {active} ativos / {len(mods)} total{RESET}")
+    lines.append(DIM_C + HLINE * w + RESET)
+    lines.append(f"  {GRAY}{'ID':<4}{'Nome':<22}{'Tipo':<18}{'Modo':<10}{'Consumo':<10}{'Status':<10}{RESET}")
+    lines.append(DIM_C + HLINE * w + RESET)
+    for m in mods:
+        if m["broken"]:
+            sc, dot, st = RED, "✕", "quebrado"
+        elif not m["active"]:
+            sc, dot, st = DIM_C, "○", "offline"
+        else:
+            sc, dot, st = GREEN, "●", "online"
+        mc = _MODE_CLR.get(m["current_mode"], WHITE)
+        lines.append(
+            f"  {AMBER}{m['id']:<4}{RESET}{sc}{dot} {m['name']:<20}{RESET}"
+            f"{GRAY}{m['type']:<18}{RESET}"
+            f"{mc}{m['current_mode']:<10}{RESET}"
+            f"{sc}{m['consumption_kw']:<10.1f}{RESET}"
+            f"{sc}{st:<10}{RESET}"
+        )
+        if len(lines) >= h - 1:
+            break
+    return lines
+
+
+def screen_eventos(snap, w, h):
+    storm = snap.get("storm", "clear")
+    temp = snap.get("temperature_c", 0.0)
+    broken = snap.get("broken_count", 0)
+    lines = []
+    lines.append(f"  {AMBER}Eventos{RESET}")
+    lines.append(DIM_C + HLINE * w + RESET)
+    storm_clr = RED if storm in ("moderate", "severe") else (YELLOW if storm == "light" else GREEN)
+    lines.append(f"  {GRAY}Tempestade de poeira:{RESET} {storm_clr}{storm}{RESET}")
+    cold = temp < -86.0  # cold-front-level deep cold (thermal heating kicks in)
+    lines.append(f"  {GRAY}Frente fria:{RESET} "
+                 f"{(BLUE + 'ATIVA' + RESET) if cold else (DIM_C + 'inativa' + RESET)}"
+                 f"   {GRAY}(temp {temp:.0f} °C){RESET}")
+    bc = RED if broken else GREEN
+    lines.append(f"  {GRAY}Falhas de equipamento:{RESET} {bc}{broken} módulo(s) em reparo{RESET}")
+    lines.append("")
+    lines.append(f"  {GRAY}Módulos quebrados (48 h){RESET}")
+    for row in sparkline([float(x) for x in snap.history("broken_count", 48)], w=48, h=3):
+        lines.append("    " + row)
+    return lines
+
+
+def screen_hierarquia(snap, w, h):
+    """Tab 6: the criticality tree live — item 1.1 visualized (replaces Crew)."""
+    root = snap.criticality_tree()
+    lines = []
+    lines.append(f"  {AMBER}Hierarquia de Criticidade{RESET}   {GRAY}(item 1.1 ao vivo){RESET}")
+    lines.append(DIM_C + HLINE * w + RESET)
+    for level in root.children:
+        leaves = level.leaves()
+        on = sum(1 for m in leaves if m["current_mode"] != "off"
+                 and not m.get("broken", False))
+        lines.append(f"  {TEAL}{BOLD}{level.name}{RESET} {GRAY}({on}/{len(leaves)} operando){RESET}")
+        for m in sorted(leaves, key=lambda x: x["id"]):
+            mode = m["current_mode"]
+            if m.get("broken", False):
+                mc, tag = RED, "✕ quebrado"
+            else:
+                mc, tag = _MODE_CLR.get(mode, WHITE), mode
+            lines.append(f"      {mc}•{RESET} {WHITE}{m['name']:<22}{RESET}{mc}{tag}{RESET}")
+            if len(lines) >= h - 1:
+                return lines
+    return lines
