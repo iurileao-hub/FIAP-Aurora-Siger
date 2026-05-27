@@ -24,6 +24,8 @@ HISTORY_KEYS = (
     "solar_generation_kw", "wind_generation_kw", "nuclear_generation_kw",
     "total_generation_kw", "total_consumption_kw",
     "battery_charge_kwh", "modes_summary", "alerts",
+    # --- M2 output labels (Fase 3 consolidation) ---
+    "energy_level", "slope", "predicted_delta", "broken_count",
 )
 
 # --- Wind ---
@@ -100,3 +102,23 @@ def solar_daytime_curve(hour):
 COLDFRONT_PROB_PER_SOL = 0.05          # ~1 frente fria a cada 20 sóis
 COLDFRONT_DURATION_HOURS = (6, 18)     # janela em horas
 COLDFRONT_DELTA_C = -30.0              # offset aplicado à temperatura enquanto ativa
+
+
+# --- Energy level (output label) + OLS trend (Fase 3, harvested from `main`) ---
+# The CRITICAL→SURPLUS machine no longer *controls* modules; it is the read-only
+# summary computed from battery % and the OLS trend. Thresholds from the team's
+# `main` branch (colonia_aurora/energy/energy_manager.py).
+ENERGY_LEVELS = ("CRITICAL", "LOW", "NOMINAL", "HIGH", "SURPLUS")
+LEVEL_CRITICAL_PCT = 20.0      # battery % below which the level is CRITICAL
+LEVEL_LOW_PCT = 40.0           # below this (and >= critical) → LOW
+LEVEL_SURPLUS_PCT = 90.0       # above this → SURPLUS
+SLOPE_CRITICAL = -2.0          # kW/h trend that forces a one-step downgrade
+SLOPE_LOW = -0.5               # milder negative trend → softer downgrade
+TREND_WINDOW = 48              # hours of recent deltas the OLS trend fits over
+
+# --- Equipment failure + timed auto-repair (Fase 3 event, no crew) ---
+# Each operational module rolls a failure each hour via the injected LCG; on
+# failure it leaves generation/consumption until an automatically sampled
+# repair window elapses.
+FAILURE_PROB_PER_HOUR = 0.005          # ~0.5%/h per operational module
+REPAIR_DURATION_HOURS = (6, 24)        # inclusive window, sampled on failure
