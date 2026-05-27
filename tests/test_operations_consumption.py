@@ -37,3 +37,28 @@ def test_current_consumption_adds_base_and_thermal():
     base = 12
     expected = base + heating_consumption_kw(COLD["temperature_c"], 0.4)
     assert current_consumption_kw(mod, COLD) == expected
+
+
+def test_power_factor_scales_base_not_thermal():
+    mod = {
+        "consumption_by_mode": {"off": 0, "minimum": 4, "adequate": 12, "surplus": 12},
+        "current_mode": "adequate",
+        "thermal_factor": 1.0,
+    }
+    deep_cold = {"temperature_c": -100.0}
+    thermal = heating_consumption_kw(-100.0, 1.0)
+    full = current_consumption_kw(mod, deep_cold, power_factor=1.0)
+    half = current_consumption_kw(mod, deep_cold, power_factor=0.5)
+    # base (12) halves; thermal term is unchanged
+    assert abs(full - (12 + thermal)) < 1e-9
+    assert abs(half - (6 + thermal)) < 1e-9
+
+
+def test_power_factor_defaults_to_one():
+    mod = {
+        "consumption_by_mode": {"off": 0, "minimum": 4, "adequate": 12, "surplus": 12},
+        "current_mode": "adequate",
+        "thermal_factor": 0.0,
+    }
+    warm = {"temperature_c": 25.0}
+    assert current_consumption_kw(mod, warm) == 12  # default power_factor=1.0

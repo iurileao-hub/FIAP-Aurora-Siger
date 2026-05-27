@@ -32,8 +32,14 @@ def heating_consumption_kw(external_temperature, thermal_factor):
     return net_W / ETA_HEATER / 1000.0
 
 
-def current_consumption_kw(module, climate):
-    """Total consumption of the module right now (kW)."""
-    base = module["consumption_by_mode"][module["current_mode"]]
+def current_consumption_kw(module, climate, power_factor=1.0):
+    """Total consumption of the module right now (kW).
+
+    `power_factor` (the first control layer, §3.4) throttles the per-mode base
+    consumption smoothly with battery level; the thermal term is never scaled
+    because pressurized habitats cannot be allowed to freeze. Defaults to 1.0
+    so callers that don't throttle (and the M1 tests) are unaffected.
+    """
+    base = module["consumption_by_mode"][module["current_mode"]] * power_factor
     thermal = heating_consumption_kw(climate["temperature_c"], module["thermal_factor"])
     return base + thermal
