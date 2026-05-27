@@ -4,6 +4,7 @@
 
 [![Fase 1 no Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iurileao-hub/FIAP-Aurora-Siger/blob/main/fases/fase-1/notebook.ipynb)
 [![Fase 2 no Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iurileao-hub/FIAP-Aurora-Siger/blob/main/fases/fase-2/notebook.ipynb)
+[![Fase 3 no Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/iurileao-hub/FIAP-Aurora-Siger/blob/main/fases/fase-3/notebook.ipynb)
 
 > Projeto desenvolvido como atividade integradora do primeiro ano do curso de **Ciência da Computação (online)** na **FIAP — 2026**. O repositório acompanha todas as **7 fases** do projeto ao longo do ano letivo, cada fase adicionando novas capacidades ao sistema.
 
@@ -15,8 +16,9 @@ O Aurora SIGER responde a essa pergunta com um pipeline de decisão **Go/No-Go**
 
 - **Fase 1 — Decolagem (telemetria):** validação determinística de 7 sensores, detecção de anomalias com Isolation Forest implementado do zero e análise energética orbital. Resultado: **"PRONTO PARA DECOLAR"** ou aborto justificado.
 - **Fase 2 — Pouso (MGPEB):** organização da fila de pouso de 12 módulos da colônia Aurora Siger em Marte, autorização por expressão booleana inspecionável `F ∧ A ∧ (L ∨ E) ∧ S` e registro auditável de cada bloqueio. Resultado: **"AUTORIZADO PARA POUSO"** ou bloqueio rastreável.
+- **Fase 3 — Operação (energia):** a colônia que pousou agora opera. Simulação horária **determinística** de geração (solar/eólica/nuclear), consumo (carga base + térmico `Q = U·A·ΔT`), bateria e clima (opacidade `tau`, tempestades, frente fria); controle de carga em duas camadas; previsão por regressão OLS feita à mão; dashboard TUI ao vivo de 6 abas. Resultado: a evolução de decisões **reativas** para **preditivas**.
 
-Em ambas as fases, a ênfase é a mesma: decisões automatizadas em sistemas críticos precisam ser **inspecionáveis** — tabela-verdade aberta, faixas seguras documentadas, histórico empilhado.
+Em todas as fases, a ênfase é a mesma: decisões automatizadas em sistemas críticos precisam ser **inspecionáveis** — tabela-verdade aberta, faixas seguras documentadas, histórico empilhado.
 
 ---
 
@@ -41,6 +43,15 @@ mgpeb
 
 # ...ou direto pelo arquivo, sem instalar
 python3 fases/fase-2/mgpeb.py
+
+# Notebook da fase 3 — operação energética da colônia
+jupyter notebook fases/fase-3/notebook.ipynb
+
+# Dashboard TUI ao vivo da fase 3 (após install, em qualquer diretório)
+aurora
+
+# ...ou direto pelo arquivo, sem instalar
+python3 fases/fase-3/aurora_core.py
 ```
 
 ---
@@ -59,29 +70,46 @@ FIAP-Aurora-Siger/
 │   ├── pipeline/                 # Fase 1 — validação e decisão Go/No-Go
 │   │   ├── validator.py
 │   │   └── launch.py
-│   └── landing/                  # Fase 2 — pouso e estabilização (MGPEB)
-│       ├── module.py
-│       ├── structures.py
-│       ├── authorization.py
-│       ├── physics.py
-│       ├── mission.py
-│       └── cli.py
+│   ├── landing/                  # Fase 2 — pouso e estabilização (MGPEB)
+│   │   ├── module.py
+│   │   ├── structures.py
+│   │   ├── authorization.py
+│   │   ├── physics.py
+│   │   ├── mission.py
+│   │   └── cli.py
+│   └── operations/               # Fase 3 — colônia operando (energia + decisão)
+│       ├── rng.py                # LCG seed-aware (determinismo)
+│       ├── tree.py / hierarchies.py   # árvores N-árias (item 1.1)
+│       ├── climate.py            # vento, temp, tau, tempestades, frente fria
+│       ├── generation.py / consumption.py / allocation.py
+│       ├── decision.py / energy_levels.py   # regras + nível (item 1.2)
+│       ├── prediction.py         # OLS à mão (item 1.3)
+│       ├── analysis.py           # balanço energético (item 1.4)
+│       ├── failures.py / simulator.py / state.py
+│       └── simsnapshot.py / dashboard.py / cli.py   # dashboard TUI ao vivo
 ├── tests/                        # pytest acompanha o pacote
 ├── fases/
 │   ├── fase-1/
 │   │   ├── notebook.ipynb
 │   │   └── assets/
-│   └── fase-2/
-│       ├── notebook.ipynb
-│       ├── mgpeb.py              # entrypoint CLI fino sobre aurora_siger.landing
+│   ├── fase-2/
+│   │   ├── notebook.ipynb
+│   │   ├── mgpeb.py              # entrypoint CLI fino sobre aurora_siger.landing
+│   │   ├── relatorio.md / .pdf   # relatório técnico da entrega FIAP
+│   │   └── figuras/
+│   └── fase-3/
+│       ├── notebook.ipynb        # narrativa dos 4 itens (run_simulation headless)
+│       ├── aurora_core.py        # entrypoint fino sobre aurora_siger.operations
 │       ├── relatorio.md / .pdf   # relatório técnico da entrega FIAP
 │       └── figuras/
 └── docs/
     ├── fase-1/
     │   ├── pseudocodigo.md / fluxograma.md / energia.md / etica.md
-    └── fase-2/
-        ├── contextualizacao-historica.md
-        └── esg.md
+    ├── fase-2/
+    │   ├── contextualizacao-historica.md
+    │   └── esg.md
+    └── fase-3/
+        └── reativo-a-preditivo.md   # ensaio reflexivo
 ```
 
 ---
@@ -109,6 +137,18 @@ FIAP-Aurora-Siger/
 | **2.6** Contextualização histórica | Ensaio sobre a evolução do hardware embarcado e a hierarquia de propriedades não-funcionais | `docs/fase-2/contextualizacao-historica.md` |
 | **2.7** Reflexão ESG | Ensaio sobre sustentabilidade, governança e cultura na colônia Aurora Siger | `docs/fase-2/esg.md` |
 | **2.8** Relatório técnico | Documento integrador da fase 2 com seções 1–6 e Anexo A | `fases/fase-2/relatorio.pdf` |
+
+## Entregáveis da Fase 3
+
+| Entregável | Descrição | Arquivo |
+|------------|-----------|---------|
+| **3.1** Organização hierárquica | Árvores N-árias funcional + criticidade (`Node`) sobre os 13 módulos da colônia (continuidade da Fase 2) | `aurora_siger/operations/hierarchies.py`, `tree.py`, `modules.py` |
+| **3.2** Regras de decisão | `evaluate_rules()` puro + nível de energia `CRITICAL→SURPLUS` como rótulo de saída | `aurora_siger/operations/decision.py`, `energy_levels.py` |
+| **3.3** Previsão por regressão | OLS de forma fechada implementada à mão; dois usos (vento→eólica e slope preditivo) | `aurora_siger/operations/prediction.py` |
+| **3.4** Análise energética | Balanço geração×consumo, agregação por sol, breakdown por fonte, momentos críticos | `aurora_siger/operations/analysis.py` |
+| **3.5** Simulação e dashboard | Simulação horária determinística (LCG); dashboard TUI ao vivo de 6 abas; CLI `aurora` | `aurora_siger/operations/simulator.py`, `dashboard.py`, `cli.py` |
+| **3.6** Reflexão crítica | Ensaio sobre a evolução de sistemas reativos para preditivos, ancorado no slope OLS | `docs/fase-3/reativo-a-preditivo.md` |
+| **3.7** Relatório técnico | Documento integrador da fase 3 com nota de consolidação e tabela de procedência | `fases/fase-3/relatorio.pdf` |
 
 ---
 
@@ -146,7 +186,7 @@ O Aurora SIGER é desenvolvido ao longo de **7 fases** durante o ano letivo de 2
 |------|------|--------|
 | **1** | Telemetria, Isolation Forest, pipeline Go/No-Go | Concluída |
 | **2** | Pouso de módulos, estruturas lineares, lógica booleana, modelagem física | Concluída |
-| **3** | *Em breve* | — |
+| **3** | Operação energética: simulação determinística, OLS, controle em 2 camadas, dashboard TUI | Concluída |
 | **4** | *Em breve* | — |
 | **5** | *Em breve* | — |
 | **6** | *Em breve* | — |
@@ -161,6 +201,8 @@ Projeto desenvolvido por alunos do 1.º ano de Ciência da Computação (online)
 - **Gabriel Carmona Bittencourt** — [GitHub](https://github.com/Gcarmnonapy7) · gabrielcarmonabittencourtpy@gmail.com
 - **Iúri Leão de Almeida** — [GitHub](https://github.com/iurileao-hub) · iurileao@gmail.com
 - **Márcio Francisco dos Santos Júnior** — [GitHub](https://github.com/Marcio-VOT) · marciofsantos65@gmail.com
+
+> **Nota de consolidação (Fase 3):** a Fase 3 foi entregue pela equipe em [repositório próprio](https://github.com/Gcarmnonapy7/fiap-aurora-siger-fase3), em duas branches arquiteturalmente distintas (`main` e `iuri`). A versão aqui presente é uma **consolidação** feita por Iúri Leão sobre as duas — núcleo científico da branch `iuri` + colheita da branch `main` —, integrada a este portfólio. Os três autores permanecem creditados; detalhes na tabela de procedência de `fases/fase-3/relatorio.pdf`.
 
 ---
 
