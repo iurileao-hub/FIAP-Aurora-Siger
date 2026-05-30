@@ -19,3 +19,9 @@ A leitura não precisa ser linear — cada documento se sustenta sozinho. Se qui
 |-----------|-------------------------|
 | [Contextualização histórica](fase-2/contextualizacao-historica.md) | Da Máquina Analítica ao RAD750: por que sistemas críticos preferem hardware antigo, e como Marte deixa essa hierarquia visível |
 | [ESG](fase-2/esg.md) | "Quando a sustentabilidade deixa de ser ideal e vira pré-condição" — onde pousar, como sustentar, quem decide na primeira colônia humana fora da Terra |
+
+## Fase 3 — Operação energética da colônia (energia + decisão)
+
+| Documento | O que você encontra ali |
+|-----------|-------------------------|
+| [Reativo a preditivo](fase-3/reativo-a-preditivo.md) | "Um sistema que só reage sobrevive a cada hora; um que também prevê começa a ter chance de planejar o sol seguinte" — reflexão sobre a evolução do controle reativo para o preditivo, ancorada no slope OLS e na necessidade do humano-no-loop |
