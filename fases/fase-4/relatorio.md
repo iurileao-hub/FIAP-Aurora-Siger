@@ -26,7 +26,7 @@ criticidade da Fase 3 (sem duplicar tabelas) e expõe o sistema via CLI `sigic`.
 | Nome | RM |
 |---|---|
 | Gabriel Carmona Bittencourt | RM569239 |
-| Márcio Francisco dos Santos Junior | RM570758 |
+| Márcio Francisco dos Santos Júnior | RM570758 |
 | Iúri Leão de Almeida | RM570215 |
 | Maria Sophia Domingues dos Santos | RM571209 |
 
@@ -183,7 +183,9 @@ A topologia reflete decisões operacionais concretas:
 
 ### 2.4 Diagrama da rede
 
-O diagrama completo está em `figuras/rede_colonia.pdf` (gerado por Graphviz/DOT).
+![Diagrama da rede da colônia Aurora Siger — 13 módulos, 20 conexões.](figuras/rede_colonia.pdf){width=90%}
+
+O diagrama acima foi gerado por Graphviz/DOT (`figuras/rede_colonia.dot`).
 Os nós são coloridos por tier de criticidade (Vital em vermelho, Sustento em laranja,
 Expansão em azul) e as arestas por tipo (energy/data/life). O layout bidimensional
 posiciona os módulos segundo suas coordenadas físicas na base marciana.
@@ -455,12 +457,13 @@ Três cenários examinam a sensibilidade ao parâmetro $r$:
 
 | Cenário | Taxa $r$ | Consumo em 10 anos | Status |
 |---|---|---|---|
-| Otimista | 8 % | 178,8 kW | Seguro (< 80 % de 210 kW) |
-| Moderado | 12 % | 265,8 kW | **Crítico** (> 210 kW em ~7 anos) |
-| Pessimista | 18 % | 448,2 kW | **Crítico** (supera geração antes de 5 anos) |
+| Otimista | 8 % | 179,2 kW | **Atenção** (> 168 kW = 80 % de 210 kW) |
+| Moderado | 12 % | 267,3 kW | **Crítico** (> 210 kW em ~7 anos) |
+| Pessimista | 18 % | 487,0 kW | **Crítico** (supera geração antes de 5 anos) |
 
 *Tabela 6 — Cenários de crescimento do consumo energético*
-*Fonte: Elaborada pelos autores (2026)*
+*Limiares: > 210 kW → CRÍTICO; > 168 kW (80 % de 210 kW) → ATENÇÃO; $\leq$ 168 kW → SEGURO.*
+*Fonte: `MathematicalModeling.simulate_scenarios()` (2026)*
 
 O cenário moderado — mais provável para uma colônia em expansão — já ultrapassa a
 capacidade instalada em 10 anos. Isso reforça a urgência de ampliar geração ou adotar
