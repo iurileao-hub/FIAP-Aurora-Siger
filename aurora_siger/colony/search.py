@@ -23,6 +23,9 @@ class DFSResult:
 
 def bfs(graph: InfrastructureGraph, start: int,
         target: Optional[int] = None) -> BFSResult:
+    """Breadth-first traversal by levels. The start node is level 0 (present in
+    `levels`/`paths`); `order_by_level` lists discovered nodes from level 1 onward.
+    If `target` is given and reachable, returns its level; else `target_found_at` is None."""
     if start not in graph.modules:
         return BFSResult({}, {}, [])
     visited = {start}
@@ -53,29 +56,33 @@ def bfs(graph: InfrastructureGraph, start: int,
 
 def dfs(graph: InfrastructureGraph, start: int,
         target: Optional[int] = None) -> DFSResult:
-    order: list[int] = []
-
-    def walk(node: int, visited: set[int], path: list[int]) -> Optional[list[int]]:
-        visited.add(node)
-        order.append(node)
-        path.append(node)
-        if target is not None and node == target:
-            return list(path)
-        for neighbor in graph.get_neighbors(node):
-            if neighbor not in visited:
-                found = walk(neighbor, visited, path)
-                if found is not None:
-                    return found
-        path.pop()
-        return None
-
+    """Depth-first traversal (iterative). Returns visit order and, if `target`
+    is given and reachable, the root-to-target path (else an empty path)."""
     if start not in graph.modules:
         return DFSResult()
-    found = walk(start, set(), [])
-    return DFSResult(order=order, path=found or [])
+    order: list[int] = []
+    visited: set[int] = set()
+    stack: list[tuple[int, list[int]]] = [(start, [])]
+    found_path: list[int] = []
+    while stack:
+        node, path = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        order.append(node)
+        path = path + [node]
+        if target is not None and node == target:
+            found_path = path
+            break
+        for neighbor in reversed(graph.get_neighbors(node)):
+            if neighbor not in visited:
+                stack.append((neighbor, path))
+    return DFSResult(order=order, path=found_path)
 
 
 def connected_components(graph: InfrastructureGraph) -> list[list[int]]:
+    """Find all connected components in the graph. Each component is sorted and
+    the list of components is sorted lexicographically for deterministic output."""
     unvisited = set(graph.modules.keys())
     components: list[list[int]] = []
     while unvisited:
@@ -90,4 +97,4 @@ def connected_components(graph: InfrastructureGraph) -> list[list[int]]:
                     unvisited.remove(neighbor)
                     queue.append(neighbor)
         components.append(sorted(component))
-    return components
+    return sorted(components)
