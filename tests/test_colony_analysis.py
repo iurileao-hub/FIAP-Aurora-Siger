@@ -40,3 +40,22 @@ def test_efficiency_reports_expected_keys():
     for key in ("total_modules", "total_connections", "average_degree",
                 "articulation_points", "clustering_coefficient", "overall_status"):
         assert key in eff
+
+
+def test_betweenness_normalized_to_unit_interval():
+    # 3-node path 1-2-3: node 2 lies on the only shortest path between 1 and 3,
+    # so its normalized betweenness is exactly 1.0; the endpoints are 0.0.
+    g = InfrastructureGraph()
+    for i in range(1, 4):
+        g.add_module(Module(i, f"N{i}", "consumer", 1.0, 5, 1.0, 1, None))
+    g.add_connection(1, 2, 1)
+    g.add_connection(2, 3, 1)
+    bc = analysis.betweenness(g)
+    assert bc[2] == 1.0
+    assert bc[1] == 0.0 and bc[3] == 0.0
+
+
+def test_centrality_has_expected_shape():
+    cent = analysis.analyze_centrality(topology.build_graph())
+    assert len(cent) == 13
+    assert set(cent[1].keys()) == {"name", "degree", "betweenness", "priority"}

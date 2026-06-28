@@ -15,6 +15,7 @@ def articulation_points(graph: InfrastructureGraph) -> list[int]:
     cut: set[int] = set()
     timer = [0]
 
+    # Recursive DFS; recursion depth is bounded by the module count (infrastructure graphs are small, far below Python's recursion limit).
     def dfs(u: int) -> None:
         visited.add(u)
         disc[u] = low[u] = timer[0]
@@ -41,6 +42,7 @@ def articulation_points(graph: InfrastructureGraph) -> list[int]:
 
 
 def clustering_coefficient(graph: InfrastructureGraph) -> float:
+    """Return the average local clustering coefficient of the network (0-1)."""
     total = 0.0
     counted = 0
     for module in graph.module_list:
@@ -87,13 +89,16 @@ def betweenness(graph: InfrastructureGraph) -> dict[int, float]:
                 delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w])
             if w != s:
                 cb[w] += delta[w]
-    # Undirected: each pair counted twice. Normalize by (n-1)(n-2).
+    # Brandes accumulates each unordered pair twice on undirected graphs, so cb[v]
+    # already counts 2x the pairs through v. Dividing by (n-1)(n-2) — which is 2x
+    # the number of unordered pairs not involving v — normalizes to [0, 1].
     n = len(nodes)
     scale = ((n - 1) * (n - 2)) if n > 2 else 1
-    return {v: (cb[v] / 2) / scale for v in nodes}
+    return {v: cb[v] / scale for v in nodes}
 
 
 def analyze_centrality(graph: InfrastructureGraph) -> dict[int, dict]:
+    """Return per-module centrality: name, degree, normalized betweenness, priority."""
     bc = betweenness(graph)
     return {
         m.id: {
@@ -107,6 +112,7 @@ def analyze_centrality(graph: InfrastructureGraph) -> dict[int, dict]:
 
 
 def analyze_efficiency(graph: InfrastructureGraph) -> dict:
+    """Return a network efficiency summary (degree, articulation points, status, ...)."""
     n = graph.get_module_count()
     edges = graph.get_connection_count()
     average_degree = (2 * edges) / n if n else 0
