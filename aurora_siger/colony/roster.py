@@ -31,15 +31,18 @@ _CRIT = _criticality_index()
 
 
 def criticality_of(module_id: int) -> str:
+    """Return the criticality tier name (Vital/Sustenance/Expansion) for a module id."""
     return _CRIT[module_id]
 
 
 def priority_of(module_id: int) -> int:
+    """Return the node priority (1-10) derived from the module's criticality tier."""
     return PRIORITY_BY_TIER[criticality_of(module_id)]
 
 
 def adequate_consumption(module: dict) -> float:
-    return module["consumption_by_mode"]["adequate"]
+    """Return the module's consumption in the 'adequate' operating mode (kW)."""
+    return float(module["consumption_by_mode"]["adequate"])
 
 
 def generation_capacity_kw() -> float:
@@ -50,6 +53,7 @@ def generation_capacity_kw() -> float:
 
 
 def derived_attributes(module_id: int) -> dict:
+    """Return the Fase-3-derived node attributes for a module id."""
     m = find_module(module_id)
     return {
         "id": m["id"],
