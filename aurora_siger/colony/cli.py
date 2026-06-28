@@ -94,7 +94,7 @@ def _screen_view_network(graph: InfrastructureGraph) -> None:
                 conn_type = graph.connection_types.get(graph._get_edge_key(id1, id2), "energy")
                 icon = _type_icon(conn_type)
                 print(f"  {icon} {label(graph.modules[id1])} <-> {label(graph.modules[id2])}")
-                print(f"     Distancia: {weight:.1f} unidades  |  Tipo: {conn_type}")
+                print(f"     Distancia: {weight:.1f} unidades  |  Tipo: {TYPE_LABELS_PT.get(conn_type, conn_type)}")
 
     n = graph.get_module_count()
     edges = graph.get_connection_count()
@@ -144,7 +144,7 @@ def _display_module_details(graph: InfrastructureGraph, module_id: int) -> None:
                 edge_key = graph._get_edge_key(module_id, neighbor_id)
                 conn_type = graph.connection_types.get(edge_key, "energy")
                 icon = _type_icon(conn_type)
-                print(f"  {icon} {label(neighbor)} (Distancia: {weight:.1f}, Tipo: {conn_type})")
+                print(f"  {icon} {label(neighbor)} (Distancia: {weight:.1f}, Tipo: {TYPE_LABELS_PT.get(conn_type, conn_type)})")
     else:
         print("  Nenhuma conexao encontrada.")
 
@@ -409,17 +409,21 @@ def _screen_efficiency(graph: InfrastructureGraph) -> None:
     print(f"  Maximo: {eff['max_edge_weight']}")
     print(f"  Minimo: {eff['min_edge_weight']}")
 
+    name_to_module = {m.name: m for m in graph.module_list}
+
     if eff["critical_modules"]:
         print("\nMODULOS CRITICOS:")
         print("-" * 40)
         for mod_name in eff["critical_modules"]:
-            print(f"  * {mod_name}")
+            m = name_to_module.get(mod_name)
+            print(f"  * {label(m) if m else mod_name}")
 
     if eff["articulation_points"]:
         print("\nPONTOS DE ARTICULACAO (vertices criticos):")
         print("-" * 40)
         for pt_name in eff["articulation_points"]:
-            print(f"  * {pt_name}")
+            m = name_to_module.get(pt_name)
+            print(f"  * {label(m) if m else pt_name}")
 
     print("\n" + "=" * 70)
     input("\nPressione ENTER para continuar...")
@@ -771,8 +775,10 @@ def _screen_cost_benefit(modeling: MathematicalModeling) -> None:
         reverse=True,
     )
 
-    for _mod_id, data in sorted_modules:
-        print(f"  {data['name']:30}")
+    for mod_id, data in sorted_modules:
+        m = modeling.graph.get_module(mod_id)
+        pt_name = label(m) if m else data["name"]
+        print(f"  {pt_name:30}")
         print(f"    Prioridade/Consumo: {data['priority_per_consumption']:.3f}")
         print(f"    Eficiencia: {data['distribution_efficiency']*100:.1f}%")
         print(f"    Status: {data['distribution_status'].upper()}")
@@ -826,8 +832,10 @@ def _screen_optimize_distribution(modeling: MathematicalModeling) -> None:
     print("\nOTIMIZACAO POR MODULO:")
     print("-" * 40)
 
-    for _mod_id, data in results.items():
-        print(f"\n  {data['name']}:")
+    for mod_id, data in results.items():
+        m = modeling.graph.get_module(mod_id)
+        pt_name = label(m) if m else data["name"]
+        print(f"\n  {pt_name}:")
         print(f"    Consumo atual: {data['current_consumption']:.2f} kWh")
         print(f"    Consumo otimo: {data['optimal_consumption']:.2f} kWh")
         print(f"    Eficiencia atual: {data['current_efficiency']*100:.1f}%")
@@ -1109,9 +1117,11 @@ def _screen_simulate_optimization(modeling: MathematicalModeling) -> None:
 
     print("\n  Modulos com maior potencial de melhoria:")
     sorted_modules = sorted(results.items(), key=lambda x: x[1]["improvement"], reverse=True)[:3]
-    for _mod_id, data in sorted_modules:
+    for mod_id, data in sorted_modules:
         if data["improvement"] > 0:
-            print(f"    * {data['name']}: {data['improvement']:.1f}%")
+            m = modeling.graph.get_module(mod_id)
+            pt_name = label(m) if m else data["name"]
+            print(f"    * {pt_name}: {data['improvement']:.1f}%")
 
 
 def _menu_simulations(graph: InfrastructureGraph) -> None:
