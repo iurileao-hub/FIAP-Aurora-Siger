@@ -6,7 +6,6 @@ read from the roster — not a hard-coded constant. Pure: no I/O.
 """
 
 import math
-from typing import Dict, List, Optional
 
 from aurora_siger.colony.graph import InfrastructureGraph
 from aurora_siger.colony.roster import generation_capacity_kw
@@ -79,7 +78,7 @@ class MathematicalModeling:
                 2 * self.total_consumption(t, growth_rate) +
                 self.total_consumption(t - self.h, growth_rate)) / (self.h ** 2)
 
-    def consumption_rate_analysis(self, t: float, growth_rate: float = 0.12) -> Dict:
+    def consumption_rate_analysis(self, t: float, growth_rate: float = 0.12) -> dict:
         """Complete analysis of consumption rates of change at time t.
 
         Application of differential calculus to understand consumption dynamics.
@@ -116,7 +115,7 @@ class MathematicalModeling:
 
     # ==================== OPTIMIZATION WITH CALCULUS ====================
 
-    def optimal_consumption_point(self, t_min: float = 0, t_max: float = 20) -> Dict:
+    def optimal_consumption_point(self, t_min: float = 0, t_max: float = 20) -> dict:
         """Finds the optimal consumption point using calculus.
 
         Applies the extreme value theorem: maxima and minima occur where
@@ -127,7 +126,7 @@ class MathematicalModeling:
         """
         critical_points = self._find_critical_points(t_min, t_max)
 
-        evaluations: List[Dict] = []
+        evaluations: list[dict] = []
 
         # Endpoints
         for t in [t_min, t_max]:
@@ -159,7 +158,7 @@ class MathematicalModeling:
             'analysis': self._analyze_optimization(evaluations)
         }
 
-    def _find_critical_points(self, t_min: float, t_max: float) -> List[float]:
+    def _find_critical_points(self, t_min: float, t_max: float) -> list[float]:
         """Finds points where the derivative is zero (bisection method).
 
         For the exponential function C(t) = C0*e^(rt), the derivative is r*C0*e^(rt),
@@ -191,7 +190,7 @@ class MathematicalModeling:
         else:
             return "ponto_inflexao"
 
-    def _analyze_optimization(self, evaluations: List[Dict]) -> str:
+    def _analyze_optimization(self, evaluations: list[dict]) -> str:
         """Qualitative analysis of optimization."""
         if not evaluations:
             return "Nenhum ponto de otimizacao encontrado."
@@ -265,7 +264,7 @@ class MathematicalModeling:
 
     # ==================== TIME SERIES ANALYSIS ====================
 
-    def temporal_consumption_analysis(self, years: int = 10, points: int = 100) -> Dict:
+    def temporal_consumption_analysis(self, years: int = 10, points: int = 100) -> dict:
         """Complete consumption analysis over time using calculus.
 
         Includes:
@@ -277,7 +276,7 @@ class MathematicalModeling:
         step = years / points
         times = [i * step for i in range(points + 1)]
 
-        data: Dict = {
+        data: dict = {
             'times': times,
             'consumption': [],
             'first_derivative': [],
@@ -332,7 +331,7 @@ class MathematicalModeling:
             'qualitative_analysis': self._qualitative_temporal_analysis(data)
         }
 
-    def _annual_growth_rate(self, data: Dict) -> float:
+    def _annual_growth_rate(self, data: dict) -> float:
         """Effective annual growth rate (CAGR) of consumption over the analysed span,
         in percent. Independent of the number of sample points used.
         """
@@ -342,7 +341,7 @@ class MathematicalModeling:
             return ((consumption[-1] / consumption[0]) ** (1 / years_span) - 1) * 100
         return 0.0
 
-    def _qualitative_temporal_analysis(self, data: Dict) -> str:
+    def _qualitative_temporal_analysis(self, data: dict) -> str:
         """Qualitative analysis of the time series."""
         derivatives = data['first_derivative']
         second_derivatives = data['second_derivative']
@@ -398,7 +397,7 @@ class MathematicalModeling:
 
     # ==================== RESOURCE OPTIMIZATION ====================
 
-    def optimize_energy_distribution(self) -> Dict:
+    def optimize_energy_distribution(self) -> dict:
         """Optimizes energy distribution using partial derivatives.
 
         Finds the point where total efficiency is maximized.
@@ -453,7 +452,7 @@ class MathematicalModeling:
 
     # ==================== PREDICTION AND SIMULATION ====================
 
-    def predict_critical_point(self, t_max: int = 50) -> Dict:
+    def predict_critical_point(self, t_max: int = 50) -> dict:
         """Predicts when projected consumption will reach a critical fraction (90%)
         of the colony's installed GENERATION capacity (kW vs kW).
         """
@@ -478,7 +477,7 @@ class MathematicalModeling:
             'message': f'Nao atingira capacidade critica de geracao nos proximos {t_max} anos.'
         }
 
-    def simulate_scenarios(self) -> Dict:
+    def simulate_scenarios(self) -> dict:
         """Simulates different growth scenarios using calculus."""
         scenarios = {
             'otimista': 0.08,
@@ -536,7 +535,7 @@ class MathematicalModeling:
         """
         return 1 - math.exp(-distance * (1 - transmission_efficiency))
 
-    def distribution_efficiency(self, module_id: int) -> Dict:
+    def distribution_efficiency(self, module_id: int) -> dict:
         """Evaluates the energy distribution efficiency for a module.
 
         Formula: E = P_consumed / P_available
@@ -580,7 +579,7 @@ class MathematicalModeling:
             'status': 'otimo' if efficiency > 0.8 else ('bom' if efficiency > 0.6 else 'critico')
         }
 
-    def growth_prediction(self, years: int = 10) -> Dict:
+    def growth_prediction(self, years: int = 10) -> dict:
         """Infrastructure growth prediction."""
         current_modules = self.graph.get_module_count()
 
@@ -612,7 +611,7 @@ class MathematicalModeling:
             'expansion_needed': max(0, max(needed) - current_modules)
         }
 
-    def cost_benefit_analysis(self) -> Dict:
+    def cost_benefit_analysis(self) -> dict:
         """Analyzes the cost-benefit of modules based on consumption and priority."""
         results = {}
 
