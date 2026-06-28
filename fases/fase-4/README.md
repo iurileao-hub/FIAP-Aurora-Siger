@@ -11,7 +11,7 @@ Esta fase apresenta o **SIGIC** (Sistema Inteligente de Gerenciamento da Infraes
 - **Dijkstra em três variantes** — caminho mínimo simples, caminho com restrição de prioridade mínima e todos os caminhos mínimos a partir de uma origem.
 - **Análise de centralidade e pontos críticos** — grau, intermediação (Brandes) e pontos de articulação (Tarjan), com demonstração didática de uma rede-ponte.
 - **Modelagem matemática** — projeção de consumo exponencial, perda energética por distância, custo-benefício e simulações de crescimento ancoradas em 210 kW gerados (Fase 3).
-- **Diagrama Graphviz** — `figuras/rede_colonia.pdf` gerado por `gerar_rede.py`: cores laranja/azul/vermelho codificam tipos energia/dados/suporte-de-vida; posições fixas refletem o layout da colônia.
+- **Mapa da rede** — `figuras/rede_colonia.png` (+ `.pdf`) gerado por `gerar_rede.py` (matplotlib): a colônia desenhada como mapa marciano — domos coloridos por tier de criticidade e dimensionados pela centralidade de intermediação, dutos com estilo por tipo (energia/dados/suporte vital), com o ponto de articulação e o Gerador Eólico isolado destacados.
 
 A continuidade com a Fase 3 é estrutural: os 13 módulos são os mesmos, a prioridade de cada nó é derivada da árvore de criticidade (Vital ≥ 8, Sustenance = 7, Expansion = 4), e a geração de 210 kW ancora os cálculos de consumo e eficiência.
 
@@ -45,13 +45,29 @@ Sem dependências externas além da stdlib: o grafo, as buscas e a modelagem sã
 
 ## Diagrama da rede
 
-O arquivo `figuras/rede_colonia.pdf` é gerado por:
+Os arquivos `figuras/rede_colonia.png` e `figuras/rede_colonia.pdf` são gerados por:
 
 ```bash
 python3 fases/fase-4/figuras/gerar_rede.py
 ```
 
-Requer o Graphviz instalado (`sudo apt install graphviz`). O script lê o grafo canônico via `topology.build_graph()`, usa os rótulos em português de `cli.PT_LABELS` e grava `rede_colonia.dot` + `rede_colonia.pdf` na mesma pasta.
+Depende apenas de `matplotlib` + `numpy`. O script lê o grafo canônico via `topology.build_graph()` e a centralidade via `analysis.betweenness()`, aplica um layout force-directed (Fruchterman-Reingold) determinístico iniciado nas posições físicas dos módulos, e grava `rede_colonia.png` + `rede_colonia.pdf` na mesma pasta. A figura é um mapa estilizado da colônia sobre o terreno marciano: domos por tier, dutos por tipo de conexão e o ponto de articulação / Gerador Eólico isolado destacados.
+
+## Reproduzindo o PDF do relatório
+
+Requisitos: [Pandoc](https://pandoc.org/) e uma distribuição LaTeX com `xelatex`. A partir desta pasta:
+
+```bash
+pandoc relatorio.md -o relatorio.pdf \
+  --pdf-engine=xelatex \
+  -V mainfont="Liberation Sans" \
+  -V fontsize=10pt \
+  -V geometry=a4paper,margin=2cm \
+  -V linestretch=1.15 \
+  --include-in-header=figuras/header.tex
+```
+
+`figuras/header.tex` mapeia glifos científicos Unicode (→ ≈ × − · Σ Δ ≥ ≤ ≠ ∝ ∀) para o modo matemático, tornando a compilação independente da fonte. Use `mainfont=Arial` se a fonte estiver instalada (Liberation Sans é métrica-compatível).
 
 ## Entregáveis desta pasta
 
@@ -59,9 +75,10 @@ Requer o Graphviz instalado (`sudo apt install graphviz`). O script lê o grafo 
 |---------|---------|
 | `sigic.py` | Entrypoint do SIGIC TUI — *thin wrapper* sobre `aurora_siger.colony.cli` |
 | `enunciado.md` | Enunciado oficial da Fase 4 (FIAP) |
-| `figuras/gerar_rede.py` | Gerador do diagrama Graphviz (lê o grafo canônico) |
-| `figuras/rede_colonia.dot` | Fonte DOT gerada (13 nós, 20 arestas, layout neato) |
-| `figuras/rede_colonia.pdf` | Diagrama renderizado — laranja=energia, azul=dados, vermelho=suporte-de-vida |
+| `figuras/gerar_rede.py` | Gerador do mapa da rede (matplotlib, lê o grafo canônico) |
+| `figuras/rede_colonia.png` | Mapa da rede — domos por tier, dutos por tipo, achado destacado |
+| `figuras/rede_colonia.pdf` | Mesma figura em vetorial (embutida no relatório) |
+| `figuras/header.tex` | Cabeçalho LaTeX (XeLaTeX) usado na compilação do PDF |
 
 A lógica de negócio vive inteiramente em `aurora_siger/colony/` (graph, roster, topology, search, paths, analysis, modeling, cli). Esta pasta contém apenas ponto de entrada e artefatos de apresentação.
 

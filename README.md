@@ -114,7 +114,7 @@ FIAP-Aurora-Siger/
 │       ├── sigic.py              # entrypoint fino sobre aurora_siger.colony
 │       ├── enunciado.md          # enunciado oficial FIAP
 │       ├── relatorio.md / .pdf   # relatório técnico da entrega FIAP
-│       └── figuras/              # rede_colonia.pdf (Graphviz)
+│       └── figuras/              # rede_colonia.png/.pdf (matplotlib)
 └── docs/
     ├── fase-1/
     │   ├── pseudocodigo.md / fluxograma.md / energia.md / etica.md
@@ -170,7 +170,7 @@ FIAP-Aurora-Siger/
 | Entregável | Descrição | Arquivo |
 |------------|-----------|---------|
 | **4.1** Código | Pacote `aurora_siger/colony/` (graph/roster/topology/search/paths/analysis/modeling/cli) + entrypoint `fases/fase-4/sigic.py` | `aurora_siger/colony/`, `fases/fase-4/sigic.py` |
-| **4.2** Diagrama | Rede da colônia gerada por Graphviz (13 nós, 20 arestas, cores por tipo de conexão) | `fases/fase-4/figuras/rede_colonia.pdf` |
+| **4.2** Diagrama | Mapa marciano da rede (matplotlib): 13 nós, 20 arestas, domos por tier e dimensionados por centralidade, dutos por tipo, ponto de articulação destacado | `fases/fase-4/figuras/rede_colonia.png` / `.pdf` |
 | **4.3** Relatório técnico | Documento integrador da fase 4 com nota de procedência, algoritmos e modelagem | `fases/fase-4/relatorio.pdf` |
 | **4.4** Enunciado | Enunciado oficial FIAP da fase 4 | `fases/fase-4/enunciado.md` |
 

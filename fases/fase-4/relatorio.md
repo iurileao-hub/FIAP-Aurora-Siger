@@ -183,12 +183,15 @@ A topologia reflete decisões operacionais concretas:
 
 ### 2.4 Diagrama da rede
 
-![Diagrama da rede da colônia Aurora Siger — 13 módulos, 20 conexões.](figuras/rede_colonia.pdf){width=90%}
+![Mapa da colônia Aurora Siger sobre o terreno marciano — 13 módulos (domos) e 20 conexões (dutos); o ponto de articulação e o Gerador Eólico isolado aparecem destacados.](figuras/rede_colonia.pdf){width=90%}
 
-O diagrama acima foi gerado por Graphviz/DOT (`figuras/rede_colonia.dot`).
-Os nós são coloridos por tier de criticidade (Vital em vermelho, Sustento em laranja,
-Expansão em azul) e as arestas por tipo (energy/data/life). O layout bidimensional
-posiciona os módulos segundo suas coordenadas físicas na base marciana.
+O mapa acima foi gerado por `figuras/gerar_rede.py` (matplotlib). Os nós são
+coloridos por tier de criticidade (Vital, Sustento, Expansão) e dimensionados pela
+centralidade de intermediação (Seção 3.5); as arestas seguem o tipo de conexão
+(energia, dados, suporte vital). O layout é force-directed (Fruchterman-Reingold)
+determinístico, iniciado nas posições físicas dos módulos. O Gerador Eólico (#13)
+aparece isolado na periferia, ligado à rede apenas pelo Armazenamento e Logística
+(#9) — o ponto de articulação destacado em vermelho.
 
 ---
 
