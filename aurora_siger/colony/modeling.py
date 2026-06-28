@@ -458,7 +458,7 @@ class MathematicalModeling:
         """
         generation_capacity = self.generation_capacity
         current_t = 0.0
-        step = 0.5
+        step = 0.1
 
         while current_t < t_max:
             consumption = self.total_consumption(current_t)

@@ -9,7 +9,7 @@ import os
 import subprocess
 
 from aurora_siger.colony import topology
-from aurora_siger.colony.cli import PT_LABELS, TYPE_LABELS_PT
+from aurora_siger.colony.cli import PT_LABELS
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EDGE_COLOR = {"energy": "orange", "data": "blue", "life": "red"}
@@ -33,7 +33,7 @@ def build_dot() -> str:
             w = g.get_weight(id1, id2)
             lines.append(f'  {id1} -- {id2} [label="{w:g}", color={EDGE_COLOR.get(ctype,"black")}];')
     lines.append("}")
-    return "\n".join(lines)
+    return "\n".join(lines) + "\n"
 
 
 def main() -> None:

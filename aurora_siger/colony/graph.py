@@ -36,7 +36,6 @@ class InfrastructureGraph:
         self.edge_weights: dict[str, float] = {}
         self.connection_types: dict[str, str] = {}
         self.adjacency_matrix: list[list[float]] = []
-        self.distance_matrix: list[list[float]] = []
 
     def _get_edge_key(self, id1: int, id2: int) -> str:
         return f"{min(id1, id2)}-{max(id1, id2)}"
@@ -81,25 +80,13 @@ class InfrastructureGraph:
     def get_connection_count(self) -> int:
         return sum(len(v) for v in self.adjacency_list.values()) // 2
 
-    def get_index(self, module_id: int) -> Optional[int]:
-        for i, mod in enumerate(self.module_list):
-            if mod.id == module_id:
-                return i
-        return None
-
     def get_adjacency_matrix(self) -> list[list[float]]:
         return self.adjacency_matrix
-
-    def get_distance_matrix(self) -> list[list[float]]:
-        return self.distance_matrix
 
     def _rebuild_matrices(self) -> None:
         n = len(self.module_list)
         idx = {mod.id: i for i, mod in enumerate(self.module_list)}
         self.adjacency_matrix = [[0.0] * n for _ in range(n)]
-        self.distance_matrix = [[float("inf")] * n for _ in range(n)]
-        for i in range(n):
-            self.distance_matrix[i][i] = 0
         for id1, neighbors in self.adjacency_list.items():
             if id1 not in idx:
                 continue
@@ -110,4 +97,3 @@ class InfrastructureGraph:
                 j = idx[id2]
                 w = self.edge_weights.get(self._get_edge_key(id1, id2), 1)
                 self.adjacency_matrix[i][j] = float(w)
-                self.distance_matrix[i][j] = float(w)
