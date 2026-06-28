@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aurora-siger"
-version = "0.3.0"
+version = "0.4.0"
 description = "Sistema Inteligente de Gerenciamento de Riscos — telemetria de decolagem, pouso de módulos e operação energética de colônia espacial"
 readme = "README.md"
 license = "MIT"
@@ -13,16 +13,21 @@ authors = [
     { name = "Gabriel Carmona Bittencourt", email = "gabrielcarmonabittencourtpy@gmail.com" },
     { name = "Iúri Leão de Almeida", email = "iurileao@gmail.com" },
     { name = "Márcio Francisco dos Santos Júnior", email = "marciofsantos65@gmail.com" },
+    { name = "Maria Sophia Domingues dos Santos", email = "maria.sophia.domingues@gmail.com" },
 ]
 keywords = [
     "anomaly-detection",
     "boolean-logic",
+    "bfs",
     "data-structures",
+    "dijkstra",
     "education",
     "energy-management",
     "fiap",
+    "graphs",
     "isolation-forest",
     "linear-data-structures",
+    "network-analysis",
     "ols-regression",
     "simulation",
     "telemetry",
@@ -62,6 +67,7 @@ dev = [
 [project.scripts]
 mgpeb = "aurora_siger.landing.cli:main"
 aurora = "aurora_siger.operations.cli:main"
+sigic = "aurora_siger.colony.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/iurileao-hub/FIAP-Aurora-Siger"
