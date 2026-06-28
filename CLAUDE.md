@@ -10,7 +10,7 @@ Aurora SIGER — atividade integradora da FIAP (Ciência da Computação online,
 
 ```bash
 pip install -e ".[dev,viz]"   # instala em modo editável
-pytest                        # 314 testes (~1.2s)
+pytest                        # 314 testes (~2.7s)
 python3 fases/fase-2/mgpeb.py        # CLI da fase 2 (ou `mgpeb` após install)
 python3 fases/fase-3/aurora_core.py  # dashboard da fase 3 (ou `aurora` após install)
 python3 fases/fase-4/sigic.py        # TUI SIGIC da fase 4 (ou `sigic` após install)
@@ -115,4 +115,4 @@ archive/                # gitignored — material original preservado
 5. Bump `__version__` para `0.N.0` em `aurora_siger/__init__.py` e `pyproject.toml`.
 6. Atualizar tabela de roadmap e entregáveis no `README.md`.
 7. Atualizar **este `CLAUDE.md`**: estado/versão (linha do "Projeto"), bloco Setup (contagem de testes, novo entrypoint), árvore de Arquitetura e nova seção "Decisões de design — fase N".
-8. Executar notebook in-place (`jupyter nbconvert --execute --inplace`) antes do commit para popular outputs.
+8. Se a fase tiver notebook: executar in-place (`jupyter nbconvert --execute --inplace`) antes do commit para popular outputs.

@@ -225,7 +225,7 @@ Projeto desenvolvido por alunos do 1.º ano de Ciência da Computação (online)
 - **Gabriel Carmona Bittencourt** — [GitHub](https://github.com/Gcarmnonapy7) · gabrielcarmonabittencourtpy@gmail.com
 - **Iúri Leão de Almeida** — [GitHub](https://github.com/iurileao-hub) · iurileao@gmail.com
 - **Márcio Francisco dos Santos Júnior** — [GitHub](https://github.com/Marcio-VOT) · marciofsantos65@gmail.com
-- **Maria Sophia Domingues dos Santos** — RM571209 (autora da Fase 4)
+- **Maria Sophia Domingues dos Santos** — RM571209 · maria.sophia.domingues@gmail.com (autora da Fase 4)
 
 > **Nota de consolidação (Fase 3):** a Fase 3 foi entregue pela equipe em [repositório próprio](https://github.com/Gcarmnonapy7/fiap-aurora-siger-fase3), em duas branches arquiteturalmente distintas (`main` e `iuri`). A versão aqui presente é uma **consolidação** feita por Iúri Leão sobre as duas — núcleo científico da branch `iuri` + colheita da branch `main` —, integrada a este portfólio. Os três autores permanecem creditados; detalhes na tabela de procedência de `fases/fase-3/relatorio.pdf`.
 
