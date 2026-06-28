@@ -25,3 +25,6 @@ archive/
 # OS
 .DS_Store
 Thumbs.db
+
+# Superpowers workflow scratch (ledger, task briefs/reports)
+.superpowers/
