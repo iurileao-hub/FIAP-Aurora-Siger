@@ -4,15 +4,16 @@ Instruções para o Claude Code ao trabalhar neste repositório.
 
 ## Projeto
 
-Aurora SIGER — atividade integradora da FIAP (Ciência da Computação online, 2026), desenvolvida em **7 fases** ao longo do ano. Para a visão de produto e os entregáveis por fase, ver [`README.md`](README.md). Estado atual: **fases 1, 2 e 3 concluídas** (versão 0.3.0).
+Aurora SIGER — atividade integradora da FIAP (Ciência da Computação online, 2026), desenvolvida em **7 fases** ao longo do ano. Para a visão de produto e os entregáveis por fase, ver [`README.md`](README.md). Estado atual: **fases 1, 2, 3 e 4 concluídas** (versão 0.4.0).
 
 ## Setup
 
 ```bash
 pip install -e ".[dev,viz]"   # instala em modo editável
-pytest                        # 276 testes (~2.4s)
+pytest                        # 314 testes (~1.2s)
 python3 fases/fase-2/mgpeb.py        # CLI da fase 2 (ou `mgpeb` após install)
 python3 fases/fase-3/aurora_core.py  # dashboard da fase 3 (ou `aurora` após install)
+python3 fases/fase-4/sigic.py        # TUI SIGIC da fase 4 (ou `sigic` após install)
 ```
 
 ## Arquitetura
@@ -27,16 +28,25 @@ aurora_siger/                   # Pacote Python — cresce com cada fase
 │   ├── physics.py       # 4 funções físicas
 │   ├── mission.py       # LandingMission (orquestrador stateful)
 │   └── cli.py           # menus interativos parametrizados em LandingMission
-└── operations/                       # Fase 3 — operação energética da colônia
-    ├── constants.py / modules.py          # 13 módulos (dicts) + parâmetros físicos
-    ├── tree.py / hierarchies.py           # Node N-ário; árvores funcional + criticidade
-    ├── climate.py / generation.py         # clima (tau, térmico, FSM); 3 fontes de energia
-    ├── consumption.py / energy_levels.py  # consumo térmico; rótulo CRITICAL→SURPLUS
-    ├── prediction.py / decision.py        # OLS à mão; evaluate_rules() puro
-    ├── allocation.py / failures.py        # load shedding 4 estágios; falhas + auto-reparo
-    ├── simulator.py / state.py / rng.py   # run_simulation; estado sem singleton; LCG
-    ├── simsnapshot.py / dashboard.py / cli.py  # adaptador; TUI 6 abas; entrypoint aurora
-    └── analysis.py                        # agrega o history em métricas de balanço
+├── operations/                       # Fase 3 — operação energética da colônia
+│   ├── constants.py / modules.py          # 13 módulos (dicts) + parâmetros físicos
+│   ├── tree.py / hierarchies.py           # Node N-ário; árvores funcional + criticidade
+│   ├── climate.py / generation.py         # clima (tau, térmico, FSM); 3 fontes de energia
+│   ├── consumption.py / energy_levels.py  # consumo térmico; rótulo CRITICAL→SURPLUS
+│   ├── prediction.py / decision.py        # OLS à mão; evaluate_rules() puro
+│   ├── allocation.py / failures.py        # load shedding 4 estágios; falhas + auto-reparo
+│   ├── simulator.py / state.py / rng.py   # run_simulation; estado sem singleton; LCG
+│   ├── simsnapshot.py / dashboard.py / cli.py  # adaptador; TUI 6 abas; entrypoint aurora
+│   └── analysis.py                        # agrega o history em métricas de balanço
+└── colony/                           # Fase 4 — topologia/rede da colônia (grafo + algoritmos)
+    ├── graph.py                       # Module @dataclass + InfrastructureGraph (adj + pesos)
+    ├── roster.py                      # 13 nós derivados de operations.MODULES (fonte única)
+    ├── topology.py                    # EDGES declarativas + build_graph() canônico
+    ├── search.py                      # BFS por níveis, DFS iterativo, connected_components
+    ├── paths.py                       # Dijkstra, variante com restrição de prioridade, all_shortest
+    ├── analysis.py                    # Tarjan (pontos de articulação), Brandes (betweenness), clustering
+    ├── modeling.py                    # C(t)=C0·e^{rt}, derivadas, perda por distância, cenários
+    └── cli.py                         # menus TUI SIGIC + PT_LABELS (rótulos em português)
 
 tests/                  # pytest na raiz, espelha o pacote
 fases/fase-N/           # entrypoint: notebook.ipynb (+ extras por fase)
@@ -84,6 +94,17 @@ archive/                # gitignored — material original preservado
 - **Consumo térmico físico**: `current_consumption_kw()` é puro — `base_por_modo × power_factor + termo_térmico (Q=U·A·ΔT)`. O termo é somado **mesmo com o módulo "off"** (habitats pressurizados não congelam) e zera com `thermal_factor == 0`.
 - **`aurora_core.py` é wrapper** sobre `aurora_siger.operations.cli:main` — espelha o `mgpeb.py` da fase 2. Dashboard TUI de 6 abas lê os dados via adaptador fino `SimSnapshot` (`.get()`/`.history()`/`.modules()`); a thread só faz *pacing* visual.
 - **Determinismo bit-a-bit**: toda aleatoriedade (clima, falhas) passa pelo **mesmo** LCG em `state["rng"]`; mesma seed ⇒ histórico idêntico (verificado por diff de dois runs headless). Execução canônica: `run_simulation(seed=42)`.
+
+## Decisões de design — fase 4
+
+> Fonte de verdade dos *porquês*: `fases/fase-4/relatorio.md` (§6 Nota de procedência) e as specs em `docs/superpowers/specs/`. Esta seção resume o que o código não conta sozinho.
+
+- **Continuidade via `operations.MODULES`**: os 13 módulos da Fase 3 são a **fonte única de verdade** para nome, tipo e consumo de cada nó do grafo. `colony/roster.py` importa `aurora_siger.operations.MODULES` em modo somente-leitura e não duplica tabelas. Qualquer mudança no roster da Fase 3 propagará automaticamente para a Fase 4.
+- **Prioridade derivada da árvore de criticidade**: `roster.py` mapeia o tier de criticidade da Fase 3 diretamente em inteiro de prioridade (`Vital → 10, Sustenance → 7, Expansion → 4`). Essa derivação garante coerência com o load-shedding da Fase 3 (Vital nunca desliga) e com o roteamento prioritário do Dijkstra na Fase 4.
+- **Idioma EN-código / PT-CLI**: os módulos, funções e campos internos seguem inglês (convenção do pacote); a apresentação ao usuário usa `cli.PT_LABELS` (dicionário de rótulos em português). Separação intencional — testes cobrem código EN; a tradução fica isolada e não afeta a lógica.
+- **Betweenness Brandes substitui enumeração de caminhos simples**: a implementação de Brandes em `analysis.betweenness()` opera em $O(V \cdot E)$ — polinomial e determinístico. A abordagem anterior (enumeração exaustiva de todos os caminhos simples) é exponencial e impraticável em grafos maiores. Brandes foi adotado sem perda de exatidão.
+- **`GENERATION_CAPACITY` derivado dos geradores reais**: `modeling.GENERATION_CAPACITY = 210` (kW) é a soma Solar (100) + Nuclear (80) + Eólico (30) lida diretamente dos dados da Fase 3. Toda a modelagem de consumo (`C(t) = C₀·e^{rt}`) e os limiares de alerta (90 % de 210 kW = 189 kW em ~7,1 anos) são ancorados nesse valor — não é uma constante inventada.
+- **Wind (#13) é folha → Logistics (#9) é ponto de articulação real**: o Gerador Eólico tem grau 1 (conectado exclusivamente ao Armazenamento e Logística). Isso faz do módulo #9 (tier Expansão, prioridade 4) o único ponto de corte da rede — contradizendo a intuição baseada só em criticidade operacional. O algoritmo de Tarjan (`analysis.articulation_points`) identifica esse risco automaticamente. **Não adicionar arestas ao Eólico sem rever esse achado.**
 
 ## Como adicionar uma nova fase
 

@@ -17,6 +17,7 @@ O Aurora SIGER responde a essa pergunta com um pipeline de decisão **Go/No-Go**
 - **Fase 1 — Decolagem (telemetria):** validação determinística de 7 sensores, detecção de anomalias com Isolation Forest implementado do zero e análise energética orbital. Resultado: **"PRONTO PARA DECOLAR"** ou aborto justificado.
 - **Fase 2 — Pouso (MGPEB):** organização da fila de pouso de 12 módulos da colônia Aurora Siger em Marte, autorização por expressão booleana inspecionável `F ∧ A ∧ (L ∨ E) ∧ S` e registro auditável de cada bloqueio. Resultado: **"AUTORIZADO PARA POUSO"** ou bloqueio rastreável.
 - **Fase 3 — Operação (energia):** a colônia que pousou agora opera. Simulação horária **determinística** de geração (solar/eólica/nuclear), consumo (carga base + térmico `Q = U·A·ΔT`), bateria e clima (opacidade `tau`, tempestades, frente fria); controle de carga em duas camadas; previsão por regressão OLS feita à mão; dashboard TUI ao vivo de 6 abas. Resultado: a evolução de decisões **reativas** para **preditivas**.
+- **Fase 4 — Topologia (rede):** a colônia que opera agora se mapeia como grafo ponderado; BFS/DFS/Dijkstra, pontos de articulação, centralidade (Brandes) e modelagem de consumo ancorada na geração real (210 kW).
 
 Em todas as fases, a ênfase é a mesma: decisões automatizadas em sistemas críticos precisam ser **inspecionáveis** — tabela-verdade aberta, faixas seguras documentadas, histórico empilhado.
 
@@ -52,6 +53,12 @@ aurora
 
 # ...ou direto pelo arquivo, sem instalar
 python3 fases/fase-3/aurora_core.py
+
+# TUI SIGIC da fase 4 (após install, em qualquer diretório)
+sigic
+
+# ...ou direto pelo arquivo, sem instalar
+python3 fases/fase-4/sigic.py
 ```
 
 ---
@@ -77,16 +84,17 @@ FIAP-Aurora-Siger/
 │   │   ├── physics.py
 │   │   ├── mission.py
 │   │   └── cli.py
-│   └── operations/               # Fase 3 — colônia operando (energia + decisão)
-│       ├── rng.py                # LCG seed-aware (determinismo)
-│       ├── tree.py / hierarchies.py   # árvores N-árias (item 1.1)
-│       ├── climate.py            # vento, temp, tau, tempestades, frente fria
-│       ├── generation.py / consumption.py / allocation.py
-│       ├── decision.py / energy_levels.py   # regras + nível (item 1.2)
-│       ├── prediction.py         # OLS à mão (item 1.3)
-│       ├── analysis.py           # balanço energético (item 1.4)
-│       ├── failures.py / simulator.py / state.py
-│       └── simsnapshot.py / dashboard.py / cli.py   # dashboard TUI ao vivo
+│   ├── operations/               # Fase 3 — colônia operando (energia + decisão)
+│   │   ├── rng.py                # LCG seed-aware (determinismo)
+│   │   ├── tree.py / hierarchies.py   # árvores N-árias (item 1.1)
+│   │   ├── climate.py            # vento, temp, tau, tempestades, frente fria
+│   │   ├── generation.py / consumption.py / allocation.py
+│   │   ├── decision.py / energy_levels.py   # regras + nível (item 1.2)
+│   │   ├── prediction.py         # OLS à mão (item 1.3)
+│   │   ├── analysis.py           # balanço energético (item 1.4)
+│   │   ├── failures.py / simulator.py / state.py
+│   │   └── simsnapshot.py / dashboard.py / cli.py   # dashboard TUI ao vivo
+│   └── colony/                   # Fase 4 — topologia/rede da colônia (grafo + algoritmos)
 ├── tests/                        # pytest acompanha o pacote
 ├── fases/
 │   ├── fase-1/
@@ -97,19 +105,26 @@ FIAP-Aurora-Siger/
 │   │   ├── mgpeb.py              # entrypoint CLI fino sobre aurora_siger.landing
 │   │   ├── relatorio.md / .pdf   # relatório técnico da entrega FIAP
 │   │   └── figuras/
-│   └── fase-3/
-│       ├── notebook.ipynb        # narrativa dos 4 itens (run_simulation headless)
-│       ├── aurora_core.py        # entrypoint fino sobre aurora_siger.operations
+│   ├── fase-3/
+│   │   ├── notebook.ipynb        # narrativa dos 4 itens (run_simulation headless)
+│   │   ├── aurora_core.py        # entrypoint fino sobre aurora_siger.operations
+│   │   ├── relatorio.md / .pdf   # relatório técnico da entrega FIAP
+│   │   └── figuras/
+│   └── fase-4/
+│       ├── sigic.py              # entrypoint fino sobre aurora_siger.colony
+│       ├── enunciado.md          # enunciado oficial FIAP
 │       ├── relatorio.md / .pdf   # relatório técnico da entrega FIAP
-│       └── figuras/
+│       └── figuras/              # rede_colonia.pdf (Graphviz)
 └── docs/
     ├── fase-1/
     │   ├── pseudocodigo.md / fluxograma.md / energia.md / etica.md
     ├── fase-2/
     │   ├── contextualizacao-historica.md
     │   └── esg.md
-    └── fase-3/
-        └── reativo-a-preditivo.md   # ensaio reflexivo
+    ├── fase-3/
+    │   └── reativo-a-preditivo.md   # ensaio reflexivo
+    └── fase-4/
+        └── operacao-a-topologia.md  # ensaio reflexivo
 ```
 
 ---
@@ -150,6 +165,15 @@ FIAP-Aurora-Siger/
 | **3.6** Reflexão crítica | Ensaio sobre a evolução de sistemas reativos para preditivos, ancorado no slope OLS | `docs/fase-3/reativo-a-preditivo.md` |
 | **3.7** Relatório técnico | Documento integrador da fase 3 com nota de consolidação e tabela de procedência | `fases/fase-3/relatorio.pdf` |
 
+## Entregáveis da Fase 4
+
+| Entregável | Descrição | Arquivo |
+|------------|-----------|---------|
+| **4.1** Código | Pacote `aurora_siger/colony/` (graph/roster/topology/search/paths/analysis/modeling/cli) + entrypoint `fases/fase-4/sigic.py` | `aurora_siger/colony/`, `fases/fase-4/sigic.py` |
+| **4.2** Diagrama | Rede da colônia gerada por Graphviz (13 nós, 20 arestas, cores por tipo de conexão) | `fases/fase-4/figuras/rede_colonia.pdf` |
+| **4.3** Relatório técnico | Documento integrador da fase 4 com nota de procedência, algoritmos e modelagem | `fases/fase-4/relatorio.pdf` |
+| **4.4** Enunciado | Enunciado oficial FIAP da fase 4 | `fases/fase-4/enunciado.md` |
+
 ---
 
 ## Faixas seguras de telemetria (Fase 1)
@@ -187,7 +211,7 @@ O Aurora SIGER é desenvolvido ao longo de **7 fases** durante o ano letivo de 2
 | **1** | Telemetria, Isolation Forest, pipeline Go/No-Go | Concluída |
 | **2** | Pouso de módulos, estruturas lineares, lógica booleana, modelagem física | Concluída |
 | **3** | Operação energética: simulação determinística, OLS, controle em 2 camadas, dashboard TUI | Concluída |
-| **4** | *Em breve* | — |
+| **4** | Topologia: grafo ponderado da colônia, BFS/DFS/Dijkstra, pontos de articulação, centralidade (Brandes), modelagem de consumo | Concluída |
 | **5** | *Em breve* | — |
 | **6** | *Em breve* | — |
 | **7** | *Em breve* | — |
@@ -201,8 +225,11 @@ Projeto desenvolvido por alunos do 1.º ano de Ciência da Computação (online)
 - **Gabriel Carmona Bittencourt** — [GitHub](https://github.com/Gcarmnonapy7) · gabrielcarmonabittencourtpy@gmail.com
 - **Iúri Leão de Almeida** — [GitHub](https://github.com/iurileao-hub) · iurileao@gmail.com
 - **Márcio Francisco dos Santos Júnior** — [GitHub](https://github.com/Marcio-VOT) · marciofsantos65@gmail.com
+- **Maria Sophia Domingues dos Santos** — RM571209 (autora da Fase 4)
 
 > **Nota de consolidação (Fase 3):** a Fase 3 foi entregue pela equipe em [repositório próprio](https://github.com/Gcarmnonapy7/fiap-aurora-siger-fase3), em duas branches arquiteturalmente distintas (`main` e `iuri`). A versão aqui presente é uma **consolidação** feita por Iúri Leão sobre as duas — núcleo científico da branch `iuri` + colheita da branch `main` —, integrada a este portfólio. Os três autores permanecem creditados; detalhes na tabela de procedência de `fases/fase-3/relatorio.pdf`.
+
+> **Nota de procedência (Fase 4):** a Fase 4 foi entregue pela equipe como repositório autônomo. A versão aqui presente é uma **consolidação** feita por Iúri Leão que integra o SIGIC a este portfólio, reutilizando os 13 módulos da Fase 3 como nós canônicos do grafo (`aurora_siger.operations.MODULES`, fonte única de verdade), derivando as prioridades diretamente da árvore de criticidade (Vital → 10, Sustenance → 7, Expansion → 4) e ancorando a modelagem de consumo nos 210 kW reais de geração instalada (Solar + Nuclear + Eólico). Nesta fase não há notebook — a entrega é o executável `sigic` e o relatório técnico. Os quatro autores (Gabriel, Iúri, Márcio e Maria Sophia) permanecem creditados; detalhes em `fases/fase-4/relatorio.pdf`.
 
 ---
 
